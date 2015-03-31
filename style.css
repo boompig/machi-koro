@@ -1,0 +1,46 @@
+html, body {
+	font-family: Helvetica, sans-serif;
+	font-size: 1em;
+}
+
+#main-container {
+	max-width: 1024px;
+	margin: 0 auto;
+}
+
+#player-container {
+	min-height: 400px;
+	clear: both;
+	display: block;
+}
+
+.player {
+	float: left;
+	width: 20%;
+}
+
+.player-name {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.playerTurn {
+	color: red;
+}
+
+
+.greyCard {
+	background-color: #777;
+	color: black;
+	font-weight: bold;
+}
+
+.greenCard {
+	background-color: rgb(120, 156, 90);
+	color: white;
+}
+
+.blueCard {
+	background-color: rgb(86, 145, 179);
+	color: white;
+}
