@@ -5,6 +5,10 @@ Array.prototype.contains = function (item) {
 /**
  * Pick a random integer in the half-open interval [a, b)
  */
-function randInt(a, b) {
+Math.randInt = function (a, b) {
 	return Math.floor(Math.random() * (b - a)) + a;
-}
+};
+
+Math.randChoice = function (arr) {
+	return arr[Math.floor(Math.random() * arr.length)];
+};

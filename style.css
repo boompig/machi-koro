@@ -16,7 +16,7 @@ html, body {
 
 .player {
 	float: left;
-	width: 20%;
+	width: 22%;
 }
 
 .player-name {
@@ -43,4 +43,17 @@ html, body {
 .blueCard {
 	background-color: rgb(86, 145, 179);
 	color: white;
+}
+
+.redCard {
+	background-color: rgb(165, 98, 97);
+	color: white;
+}
+
+.selectable-card {
+	cursor: pointer;
+}
+
+#dice-roll {
+	font-weight: bold;
 }

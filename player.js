@@ -1,51 +1,104 @@
-function Player (name) {
+var require = require || null;
+if (require) {
+	var c = require("./cards.js");
+	var cards = c.cards;
+	var colors = c.colors;
+	var categories = c.categories;
+	var Card = c.Card;
+}
+
+function Player (name, stratGroup, weights) {
 	"use strict";
 	this.name = name;
 	this.cards = {};
 	this.money = 0;
 	this.points = 0;
+	this.isHuman = false;
+
+	this.stratGroup = stratGroup || null;
+
+	// for AI?
+	weights = weights || {};
+	this.cardWeights = weights[stratGroup] || {};
+
+	if (Object.keys(this.cardWeights).length === 0) {
+		for (var cardName in cards) {
+			this.cardWeights[cardName] = 1;
+		}
+	} else {
+		for (var cardName in cards) {
+			if (! this.cardWeights.hasOwnProperty(cardName)) {
+				this.cardWeights[cardName] = 0;
+			}
+		}
+	}
 }
+
+/**
+ * This function is called once the game is over.
+ * Add 1 to all cards the player owns
+ * TODO for now, this is regardless of qty
+ */
+Player.prototype.feedbackCardWeights = function () {
+	"use strict";
+	var cardName;
+	for (cardName in cards) {
+		if (! this.cards.hasOwnProperty(cardName)) {
+			if (this.cardWeights[cardName] > 1) {
+				// decay
+				this.cardWeights[cardName]--;
+			}
+		}
+	}
+
+	for (cardName in this.cards) {
+		if ((cardName === "WHEAT_FIELD" || cardName === "BAKERY") && this.cards[cardName] === 1) {
+			if (this.cardWeights[cardName] > 1) {
+				// decay
+				this.cardWeights[cardName]--;
+			}
+		} else {
+			this.cardWeights[cardName]++;
+		}
+	}
+};
 
 Player.prototype.canBuyCard = function (cardName) {
 	"use strict";
 	var card = cards[cardName];
 	return card.cost <= this.money && ! (card.color === colors.GREY && this.hasCard(cardName));
-}
+};
 
-Player.prototype.turn = function (gameState) {
+/**
+ * @return Array of affordable card names
+ */
+Player.prototype.getAffordableCards = function (gameState) {
 	"use strict";
-	// basically perform some sort of strategy...
-	// for now, buy a random card that I can afford
-
-	// all cards which I can afford and are still available
-	var canAffordCards = [];
-
 	var deck = gameState.deck;
 	var card, cardName;
-
+	var canAffordCards = [];
 	for (cardName in cards) {
 		card = cards[cardName];
 		if (deck.hasOwnProperty(cardName) && deck[cardName] > 0 && this.canBuyCard(cardName)) {
 			canAffordCards.push(cardName);
 		}
 	}
+	return canAffordCards;
+};
+
+Player.prototype.turn = function (gameState) {
+	"use strict";
+	
+	var canAffordCards = this.getAffordableCards(gameState);
 
 	if (canAffordCards.length > 0) {
-		for (var i = 0; i < canAffordCards.length; i++) {
-			writeLog(this, gameState, "can afford " + canAffordCards[i]);
-		}
-
-		var idx = randInt(0, canAffordCards.length);
-		var buyCardName = canAffordCards[idx];
+		var buyCardName = this.pickBuyCard(canAffordCards);
 		var buyCard = cards[buyCardName];
 
-		writeLog(this, gameState, "buying " + buyCardName);
-		if (cards[buyCardName].color === colors.GREY) {
-			this.points++;
-		}
+		gameState.writeLog(this, "buying " + buyCardName);
 		gameState.buyCard(buyCardName, this);
 	} else {
-		writeLog(this, gameState, "cannot afford any cards");
+		gameState.writeLog(this, "cannot afford any cards");
 	}
 };
 
@@ -54,14 +107,45 @@ Player.prototype.hasCard = function (cardName) {
 	return this.cards.hasOwnProperty(cardName);
 };
 
+Player.prototype.pickBuyCard = function (canAffordCards) {
+	var n = 0, cardName;
+	var a = [];
+	for (var i = 0; i < canAffordCards.length; i++) {
+		cardName = canAffordCards[i];
+
+		// add 1 card for each additional weight
+		for (var j = 0; j < this.cardWeights[cardName]; j++) {
+			a.push(cardName);
+		}
+	}
+
+	return Math.randChoice(a);
+};
+
+/**
+ * Called when the player has a RADIO_TOWER, and can decide to re-roll
+ * Return true to reroll, false otherwise
+ */
+Player.prototype.decideReroll = function (rollArray) {
+	"use strict";
+	//TODO random decision for now
+	return Math.random() > 0.5;
+};
+
 /**
  * Return number of dice for this player to roll
+ * TODO make a decision about whether to roll 2 dice or 1
  */
 Player.prototype.getNumDice = function () {
 	"use strict";
-	if (this.hasCard("train station")) {
+	if (this.hasCard("TRAIN_STATION")) {
 		return 2;
 	} else {
 		return 1;
 	}
 };
+
+var exports = exports || null;
+if (exports) {
+	exports.Player = Player;
+}
