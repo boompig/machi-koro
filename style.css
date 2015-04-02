@@ -50,6 +50,11 @@ html, body {
 	color: white;
 }
 
+.purpleCard {
+	background-color: rgb(138, 96, 139);
+	color: white;
+}
+
 .selectable-card {
 	cursor: pointer;
 }

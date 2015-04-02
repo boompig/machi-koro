@@ -5,6 +5,9 @@ if (require) {
 	var colors = c.colors;
 	var categories = c.categories;
 	var Card = c.Card;
+
+	var globals = {};
+	globals.cards = cards;
 }
 
 function Player (name, stratGroup, weights) {
@@ -44,8 +47,8 @@ Player.prototype.feedbackCardWeights = function () {
 	var cardName;
 	for (cardName in cards) {
 		if (! this.cards.hasOwnProperty(cardName)) {
+			// decay, but never decay to 0
 			if (this.cardWeights[cardName] > 1) {
-				// decay
 				this.cardWeights[cardName]--;
 			}
 		}
@@ -53,8 +56,8 @@ Player.prototype.feedbackCardWeights = function () {
 
 	for (cardName in this.cards) {
 		if ((cardName === "WHEAT_FIELD" || cardName === "BAKERY") && this.cards[cardName] === 1) {
+			// decay, but never decay to 0
 			if (this.cardWeights[cardName] > 1) {
-				// decay
 				this.cardWeights[cardName]--;
 			}
 		} else {
@@ -74,12 +77,14 @@ Player.prototype.canBuyCard = function (cardName) {
  */
 Player.prototype.getAffordableCards = function (gameState) {
 	"use strict";
+	gameState.writeLog(this, "Evaluating affordable cards");
 	var deck = gameState.deck;
 	var card, cardName;
 	var canAffordCards = [];
-	for (cardName in cards) {
-		card = cards[cardName];
+	for (cardName in globals.cards) {
+		card = globals.cards[cardName];
 		if (deck.hasOwnProperty(cardName) && deck[cardName] > 0 && this.canBuyCard(cardName)) {
+			gameState.writeLog(this, "can afford " + cardName);
 			canAffordCards.push(cardName);
 		}
 	}
@@ -95,8 +100,10 @@ Player.prototype.turn = function (gameState) {
 		var buyCardName = this.pickBuyCard(canAffordCards);
 		var buyCard = cards[buyCardName];
 
-		gameState.writeLog(this, "buying " + buyCardName);
-		gameState.buyCard(buyCardName, this);
+		if (buyCardName !== null) {
+			gameState.writeLog(this, "buying " + buyCardName + " -> name " + buyCard.name);
+			gameState.buyCard(buyCardName, this);
+		}
 	} else {
 		gameState.writeLog(this, "cannot afford any cards");
 	}
@@ -108,7 +115,8 @@ Player.prototype.hasCard = function (cardName) {
 };
 
 Player.prototype.pickBuyCard = function (canAffordCards) {
-	var n = 0, cardName;
+	"use strict";
+	var cardName;
 	var a = [];
 	for (var i = 0; i < canAffordCards.length; i++) {
 		cardName = canAffordCards[i];
@@ -118,8 +126,12 @@ Player.prototype.pickBuyCard = function (canAffordCards) {
 			a.push(cardName);
 		}
 	}
-
-	return Math.randChoice(a);
+	if (a.length > 0) {
+		return Math.randChoice(a);	
+	} else {
+		// this shouldn't really happen
+		return null;
+	}
 };
 
 /**
@@ -130,6 +142,17 @@ Player.prototype.decideReroll = function (rollArray) {
 	"use strict";
 	//TODO random decision for now
 	return Math.random() > 0.5;
+};
+
+Player.prototype.getStealPlayerTargetMoney = function (gameState, cardYield) {
+	// TODO pick a random player for now
+	var p, name;
+	var cpName = gameState.getCurrentPlayer().name;
+	do {
+		p = Math.randChoice(gameState.players);
+		name = p.name;
+	} while (name !== cpName);
+	return name;
 };
 
 /**

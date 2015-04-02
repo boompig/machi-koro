@@ -10,12 +10,13 @@ if (require) {
 	var colors = c.colors;
 	var categories = c.categories;
 	var Card = c.Card;
+
+	var Stolen = c.Stolen;
 }
 
 var states = {
 	ROLL: "ROLL",
 	BUY: "BUY",
-	NEXT: "NEXT",
 	GG: "GAME_OVER"
 };
 
@@ -31,7 +32,8 @@ var MachiKoroCtrl = function ($scope) {
 			greyCard: card.color === colors.GREY,
 			greenCard: card.color === colors.GREEN,
 			blueCard: card.color === colors.BLUE,
-			redCard: card.color === colors.RED
+			redCard: card.color === colors.RED,
+			purpleCard: card.color === colors.PURPLE
 		}
 	};
 
@@ -48,6 +50,47 @@ var MachiKoroCtrl = function ($scope) {
 	 */
 	$scope.getCardRolls = function (cardName) {
 		return cards[cardName].roll.join(", ");
+	};
+
+	/**
+	 * Ask the user whether they want a reroll.
+	 * Called appropriately by other functions.
+	 */
+	$scope.decideHumanReroll = function (rollArray) {
+		return !confirm("You rolled " + rollArray.join(", ") + ". Keep this roll?");
+	};
+
+	/**
+	 * Ask the user how many dice they want to roll.
+	 * Called appropriately by other functions.
+	 */
+	$scope.getHumanNumDice = function () {
+		if ( confirm("Roll 2 dice? Cancel to roll 1.") ) {
+			return 2;
+		} else {
+			return 1;
+		}
+	};
+
+	$scope.getStealPlayerTargetMoney = function (gameState, numCoins) {
+		var players = gameState.players;
+		var name;
+		do {
+			name = prompt("Who do you want to steal " + numCoins + " coins from?");
+		} while (this.getPlayerByName(name) !== null);
+		return name;
+	};
+
+	/**
+	 * TODO this is not working
+	 */
+	$scope.getStealPlayerTargetCard = function (gameState) {
+		var players = gameState.players;
+		var name;
+		do {
+			name = prompt("Who do you want to steal a card from?");
+		} while (players.indexOf(name) < 0);
+		return name;
 	};
 
 	// used for AI
@@ -75,11 +118,12 @@ var MachiKoroCtrl = function ($scope) {
 	};
 
 	/**
-	 * Evaluate dice roll for green and blue cards, and return how much is stolen, if any, for red cards
+	 * Evaluate dice roll for green and blue cards, and return how much is stolen, if any, for red cards and purple cards
+	 * @return stolen array, of Stolen obj
 	 */
 	this.evalDiceRoll = function (player, diceRoll) {
 		var playerTurn = this.isPlayerTurn(player);
-		var stolen = 0;
+		var stolen = [];
 		var cafe_bakery_bonus = 0;
 		if (player.hasCard("SHOPPING_MALL")) {
 			cafe_bakery_bonus = 1
@@ -89,6 +133,7 @@ var MachiKoroCtrl = function ($scope) {
 			if (player.cards.hasOwnProperty(cardName)) {
 				var card = cards[cardName];
 				var cardYield = card.card_yield;
+				var numCard = player.cards[cardName];
 
 				if (card.category === categories.CAFE || card.category === categories.BAKERY) {
 					cardYield += cafe_bakery_bonus;
@@ -115,7 +160,6 @@ var MachiKoroCtrl = function ($scope) {
 
 						// count the number of things of this category
 						var count = 0;
-						var numCard = player.cards[cardName];
 						for (var c in player.cards) {
 							if (cards[c].category === targetCat) {
 								count += player.cards[c];
@@ -125,9 +169,33 @@ var MachiKoroCtrl = function ($scope) {
 						this.writeLog(player, numCard + " x " + cardName + " generated " + numCard * count * cardYield + " coins due to " + count + " " + targetCat + " cards");
 						player.money += (numCard * count * cardYield);
 					} else if (card.color === colors.RED) {
-						stolen += cardYield;
+						this.writeLog(player, "Stole " + (cardYield * numCard) + " coins from current player using " + numCard + " x " + cardName);
+						var s = new Stolen("current", cardYield * numCard, null);
+						stolen.push(s);
+					} else if (card.color === colors.PURPLE) {
+						switch (cardName) {
+							case "STADIUM":
+								this.writeLog(player, "Stole " + (cardYield * numCard) + " coins from each player using " + numCard + " x " + cardName);
+								var s = new Stolen("all", cardYield * numCard, null);
+								stolen.push(s);
+								break;
+							case "TV_STATION":
+								var targetPlayer;
+								for (var t = 0; t < numCard; t++) {
+									if (player.isHuman) {
+										targetPlayer = $scope.getStealPlayerTargetMoney(this, cardYield);
+									} else {
+										targetPlayer = player.getStealPlayerTargetMoney(this, cardYield);
+									}
+									this.writeLog(player, "Stole " + cardYield + " coins from " + targetPlayer + " using " + cardName);
+									var s = new Stolen(targetPlayer, cardYield, null);
+									stolen.push(s);
+								}
+								break;
+						}
 					} else {
-						player.money += cardYield;
+						this.writeLog(player, "Got " + (cardYield * numCard) + " coins from " + numCard + " x " + cardName);
+						player.money += cardYield * numCard;
 					}
 				}
 			}
@@ -142,7 +210,12 @@ var MachiKoroCtrl = function ($scope) {
 
 	this.getDiceRoll = function () {
 		var currentPlayer = this.getCurrentPlayer();
-		var numDice = currentPlayer.getNumDice();
+		var numDice;
+		if (currentPlayer.isHuman && currentPlayer.hasCard("TRAIN_STATION")) {
+			numDice = $scope.getHumanNumDice();
+		} else {
+			numDice = currentPlayer.getNumDice();
+		}
 		var rollArray = [];
 		for (var i = 0; i < numDice; i++) {
 			rollArray.push(this.rollDie());
@@ -150,11 +223,25 @@ var MachiKoroCtrl = function ($scope) {
 		return rollArray;
 	};
 
+	/**
+	 * Roll the dice.
+	 * Called at the beginning of a player's turn.
+	 * Evaluate card effects.
+	 */
 	this.rollDice = function () {
 		var player = this.getCurrentPlayer();
 		var rollArray = this.getDiceRoll();
-		if (player.hasCard("RADIO_TOWER") && player.decideReroll(rollArray)) {
-			rollArray = this.getDiceRoll();
+		if (player.hasCard("RADIO_TOWER")) {
+			if (player.isHuman) {
+				
+				if ($scope.decideHumanReroll(rollArray)) {
+					rollArray = this.getDiceRoll();
+				}
+			} else {
+				if (player.decideReroll(rollArray)) {
+					rollArray = this.getDiceRoll();
+				}
+			}
 		}
 		var diceRoll = rollArray.reduce(function(a, b) { return a + b; });
 
@@ -167,34 +254,70 @@ var MachiKoroCtrl = function ($scope) {
 		for (var i = 0; i < this.players.length; i++) {
 			p = this.players[i];
 			stolen[p.name] = this.evalDiceRoll(this.players[i], diceRoll);
-			if (stolen[p.name] > 0) {
+			if (stolen[p.name] !== []) {
 				isStolen = true;
 			}
 		}
 
+		var cp = this.getCurrentPlayer();
+
 		if (isStolen) {
-			// console.log("stolen:");
-			// console.log(stolen);
+			this.writeLog(cp, "Evaluating stolen array");
 			var idx = (this.turn % this.players.length);
-			var cp = this.getCurrentPlayer();
-			if (cp.money > 0) {
-				for (var k = 1; k < this.players.length - 1; k++) {
-					var p = this.players[(idx + k) % this.players.length];
-					if (stolen[p.name] === 0) continue;
-					var m = Math.min(stolen[p.name], cp.money);
-					this.writeLog(cp, p.name + " stole " + m + " from " + cp.name);
-					p.money += m;
-					cp.money -= m;
-					if (cp.money === 0) {
-						break;
-					}
+
+			for (var k = 0; k < this.players.length; k++) {
+				var p = this.players[(idx + k) % this.players.length];
+				var stolenArr = stolen[p.name];
+
+				for (var j = 0; j < stolenArr.length; j++) {
+					this.evalStolen(cp, p, stolenArr[j]);
 				}
-			} else {
-				this.writeLog(cp, "stealing failed because " + cp.name + " is broke");
 			}
 		}
 
 		this.state = states.BUY;
+	};
+
+	this.stealMoney = function (fromPlayer, toPlayer, amt) {
+		var m = Math.min(amt, fromPlayer.money);
+		this.writeLog(toPlayer, "Stole " + m + " coins from " + fromPlayer.name);
+		fromPlayer.money -= m;
+		toPlayer.money += m;
+	};
+
+	this.evalStolen = function (currentPlayer, player, stolen) {
+		switch (stolen.category) {
+			case "all":
+				for (var i = 0; i < this.players.length; i++) {
+					var p = this.players[i];
+					if (p !== player) {
+						this.stealMoney(p, player, stolen.amt);
+					}
+				}
+				break;
+			case "current":
+				var cp = this.getCurrentPlayer();
+				this.stealMoney(cp, player, stolen.amt);
+				break;
+			default:
+				var targetPlayer = this.getPlayerByName(stolen.category);
+				if (targetPlayer !== null) {
+					this.stealMoney(targetPlayer, player, stolen.amt);
+				}
+				break;
+		}
+	};
+
+	/**
+	 * Return player object if found, null otherwise
+	 */
+	this.getPlayerByName = function (name) {
+		for (var i = 0; i < this.players.length; i++) {
+			if (this.players[i].name === name) {
+				return this.players[i];
+			}
+		}
+		return null;
 	};
 
 	/**
@@ -253,15 +376,9 @@ var MachiKoroCtrl = function ($scope) {
 		if (this.state === states.ROLL) {
 			this.rollDice();
 			this.evalStrat();
-			if (this.state === states.NEXT) {
-				this.nextTurn();
-			} else {
+			if (this.state === states.GG) {
 				var winningPlayer = this.getCurrentPlayer();
 				this.writeLog(winningPlayer, winningPlayer.name + " won the game!");
-
-				// winningPlayer.feedbackCardWeights();
-				// console.log("stratGroup = " + winningPlayer.stratGroup);
-				// console.log(winningPlayer.cardWeights);
 			}
 		}
 	};
@@ -319,7 +436,11 @@ var MachiKoroCtrl = function ($scope) {
 
 	this.writeLog = function (player, msg) {
 		"use strict";
-		console.log("[" + player.name + " on turn " + this.turn + "] " + msg);
+		if (this.bonusTurn) {
+			console.log("[" + player.name + " on turn " + this.turn + " (bonus)] " + msg);
+		} else {
+			console.log("[" + player.name + " on turn " + this.turn + "] " + msg);
+		}
 	};
 
 	/**

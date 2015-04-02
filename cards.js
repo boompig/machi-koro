@@ -1,6 +1,17 @@
 "use strict";
 
 /**
+ * @param category: ['all', 'current', <name>]
+ * @param amt: Amount to steal
+ * @param card: name of card to steal, or null
+ */
+function Stolen (category, amt, card) {
+	this.category = category;
+	this.amt = amt;
+	this.card = card;
+}
+
+/**
  * A card in the game of Machi Koro
  */
 function Card (name, cost, card_yield, color, roll, category) {
@@ -22,9 +33,9 @@ Card.prototype.hasEffect = function (diceRoll, isPlayerTurn) {
 		return false;
 	}
 
-	return (isPlayerTurn && this.color === colors.GREEN) || 
+	return (isPlayerTurn && (this.color === colors.GREEN || this.color === colors.PURPLE)) || 
 		   (this.color === colors.BLUE) ||
-		   (!isPlayerTurn && this.color === colors.RED)
+		   (!isPlayerTurn && this.color === colors.RED);
 };
 
 Card.prototype.isGrey = function () {
@@ -41,15 +52,14 @@ var categories = {
 	GEAR: "GEAR",
 	TOWER: "TOWER",
 	// different symbol from other factories
-	PRODUCE_FACTORY: "PRODUCE_FACTORY",
-	// grey victory cards
-	VICTORY: "VICTORY"
+	PRODUCE_FACTORY: "PRODUCE_FACTORY"
 };
 
 var colors = {
 	GREEN: "green",
 	BLUE: "blue",
 	RED: "red",
+	PURPLE: "purple",
 	GREY: "grey"
 };
 
@@ -71,10 +81,14 @@ var cards = {
 	APPLE_ORCHARD: new Card("apple orchard", 3, 3, colors.BLUE, [10], categories.WHEAT),
 	PRODUCE_MARKET: new Card("produce market", 2, 2, colors.GREEN, [11, 12], categories.PRODUCE_FACTORY),
 
-	TRAIN_STATION: new Card("train station", 4, 0, colors.GREY, [], categories.VICTORY),
-	SHOPPING_MALL: new Card("shopping mall", 10, 0, colors.GREY, [], categories.VICTORY),
-	AMUSEMENT_PARK: new Card("amusement park", 16, 0, colors.GREY, [], categories.VICTORY),
-	RADIO_TOWER: new Card("radio tower", 22, 0, colors.GREY, [], categories.VICTORY)
+	STADIUM: new Card("stadium", 6, 2, colors.PURPLE, [6], categories.TOWER),
+	TV_STATION: new Card("TV station", 7, 5, colors.PURPLE, [6], categories.TOWER),
+	// BUSINESS_COMPLEX: new Card("business complex", 8, 0, colors.PURPLE, [6], categories.TOWER),
+
+	TRAIN_STATION: new Card("train station", 4, 0, colors.GREY, [], categories.TOWER),
+	SHOPPING_MALL: new Card("shopping mall", 10, 0, colors.GREY, [], categories.TOWER),
+	AMUSEMENT_PARK: new Card("amusement park", 16, 0, colors.GREY, [], categories.TOWER),
+	RADIO_TOWER: new Card("radio tower", 22, 0, colors.GREY, [], categories.TOWER)
 };
 
 var exports = exports || null;
@@ -83,4 +97,5 @@ if (exports) {
 	exports.colors = colors;
 	exports.categories = categories;
 	exports.Card = Card;
+	exports.Stolen = Stolen;
 }
