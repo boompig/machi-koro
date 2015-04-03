@@ -73,6 +73,14 @@ var MachiKoroCtrl = function ($scope) {
 
 	/**
 	 * For use in Angular visuals, helper method
+	 * Return name of card to display to user
+	 */
+	$scope.getCardName = function (cardName) {
+		return cards[cardName].name;
+	};
+
+	/**
+	 * For use in Angular visuals, helper method
 	 */
 	$scope.getCardCost = function (cardName) {
 		return cards[cardName].cost;

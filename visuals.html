@@ -15,10 +15,11 @@
 		<div id="main-container">
 			<div id="player-container">
 				<div class="player" ng-repeat="player in game.players">
-					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">{{ player.name }}</div>
-					<div>Human Player <input type="checkbox" ng-model="player.isHuman" /></div>
+					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
+						<span>{{ player.name }}</span>
+						<span ng-show="! player.isHuman">(Bot)</span>
+					</div>
 					<div class="player-money">Money: {{ player.money }}</div>
-					<div class="player-points">Points: {{ player.points }}</div>
 					<div class="player-cards">
 						<h5>Cards</h5>
 						<div class="card-container">
@@ -34,35 +35,33 @@
 
 			<div id="dice-panel">
 				<span  ng-if="game.lastRoll !== null">
-					<img ng-src="dice-{{ game.lastRoll[0] }}.png" />
-					<img ng-if="game.lastRoll.length > 1" ng-src="dice-{{ game.lastRoll[1] }}.png" />
+					<img class="dice-img" ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
+					<img class="dice-img" ng-if="game.lastRoll.length > 1" ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
 				</span>
 			</div>
 			
-			<div class="card-container" ng-show="game.getCurrentPlayer().isHuman && game.state === 'BUY'">
+			<div id="buy-card-container" class="card-container" ng-show="game.getCurrentPlayer().isHuman && game.state === 'BUY'">
 				<h4>Cards for Sale</h4>
-				<div class="card selectable-card" ng-repeat="cardName in game.getCurrentPlayer().getAffordableCards(game)" 
-				     ng-class="getCardClass(cardName)" ng-click="game.buyCard(cardName, game.getCurrentPlayer())">
-					<span class="card-name">{{ cardName }}</span>&nbsp;
+				<div class="card selectable-card" ng-repeat="cardName in game.getCurrentPlayer().getAffordableCards(game)"
+				ng-click="game.buyCard(cardName, game.getCurrentPlayer())">
+				    <img class="card-img" ng-src="images/cards/{{ cardName.toLowerCase() }}" />
+				    <div class="card-name">{{ getCardName(cardName) }}</div>
+					<!-- <span class="card-name">{{ cardName }}</span>&nbsp;
 					<span class="card-cost">(costs {{ getCardCost(cardName) }} coins)</span>&nbsp;
 					<span class="card-rolls">[yields {{ getCardRolls(cardName) }} coins]</span>&nbsp;
-					<span class="card-remain"> - {{ game.deck[cardName] }} remaining</span>
+					<span class="card-remain"> - {{ game.deck[cardName] }} remaining</span> -->
 				</div>
 				<div class="no-cards" ng-if="game.getCurrentPlayer().getAffordableCards(game).length === 0">You can't buy any cards</div>
 			</div>
 
 			<div id="btn-panel">
-				<button class="btn btn-default" ng-click="game.rollDice()" ng-disabled="game.state !== 'ROLL'">Roll</button>
-				<button class="btn" ng-click="game.evalStrat()"
-				        ng-class="{ 'btn-danger': game.getCurrentPlayer().isHuman, 'btn-info': !game.getCurrentPlayer().isHuman }"
-				        ng-disabled="game.state !== 'BUY'">
-					{{ game.getCurrentPlayer().isHuman? "Finish Buying" : "Eval Strat" }}</button>
-				
-				<span ng-if="game.hasHumanPlayers()">
-					<button class="btn btn-success" ng-click="game.skipBotTurns()"
-						    ng-disabled="game.state !== 'ROLL' || game.getCurrentPlayer().isHuman">Skip Bot Turns</button>
+				<span ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
+					<button class="btn btn-default" ng-click="game.rollDice()" ng-disabled="game.state !== 'ROLL'">Roll</button>
+					<button class="btn btn-danger" ng-click="game.evalStrat()" ng-disabled="game.state !== 'BUY'">End Turn</button>
 				</span>
-
+				<span ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
+					<button class="btn btn-default" ng-click="game.doTurn()" ng-disabled="game.state !== 'ROLL'">Evaluate Bot Turn</button>
+				</span>
 			</div>
 		</div>
 
