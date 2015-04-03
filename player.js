@@ -8,9 +8,12 @@ if (require) {
 
 	var globals = {};
 	globals.cards = cards;
+} else {
+	var globals = {};
+	globals.cards = cards;
 }
 
-function Player (name, stratGroup, weights) {
+function Player (name, weights) {
 	"use strict";
 	this.name = name;
 	this.cards = {};
@@ -18,11 +21,9 @@ function Player (name, stratGroup, weights) {
 	this.points = 0;
 	this.isHuman = false;
 
-	this.stratGroup = stratGroup || null;
-
 	// for AI?
 	weights = weights || {};
-	this.cardWeights = weights[stratGroup] || {};
+	this.cardWeights = weights[name] || {};
 
 	if (Object.keys(this.cardWeights).length === 0) {
 		for (var cardName in cards) {
@@ -77,14 +78,14 @@ Player.prototype.canBuyCard = function (cardName) {
  */
 Player.prototype.getAffordableCards = function (gameState) {
 	"use strict";
-	gameState.writeLog(this, "Evaluating affordable cards");
+	gameState.writeLog(this, "Evaluating affordable cards", gameState.VERBOSE);
 	var deck = gameState.deck;
 	var card, cardName;
 	var canAffordCards = [];
 	for (cardName in globals.cards) {
 		card = globals.cards[cardName];
 		if (deck.hasOwnProperty(cardName) && deck[cardName] > 0 && this.canBuyCard(cardName)) {
-			gameState.writeLog(this, "can afford " + cardName);
+			gameState.writeLog(this, "can afford " + cardName, gameState.VERBOSE);
 			canAffordCards.push(cardName);
 		}
 	}
@@ -101,7 +102,7 @@ Player.prototype.turn = function (gameState) {
 		var buyCard = cards[buyCardName];
 
 		if (buyCardName !== null) {
-			gameState.writeLog(this, "buying " + buyCardName + " -> name " + buyCard.name);
+			gameState.writeLog(this, "buying " + buyCardName);
 			gameState.buyCard(buyCardName, this);
 		}
 	} else {

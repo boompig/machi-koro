@@ -8,11 +8,11 @@
 
 		<!-- CDN-hosted bootstrap -->
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
-	</head>
-	<body ng-controller="MachiKoroCtrl as game">
-		<div id="main-container">
-			<h2>Machi Koro simulation</h2>
 
+		<link rel="stylesheet" href="visual.css" />
+	</head>
+	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
+		<div id="main-container">
 			<div id="player-container">
 				<div class="player" ng-repeat="player in game.players">
 					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">{{ player.name }}</div>
@@ -31,6 +31,13 @@
 					</div>
 				</div>
 			</div>
+
+			<div id="dice-panel">
+				<span  ng-if="game.lastRoll !== null">
+					<img ng-src="dice-{{ game.lastRoll[0] }}.png" />
+					<img ng-if="game.lastRoll.length > 1" ng-src="dice-{{ game.lastRoll[1] }}.png" />
+				</span>
+			</div>
 			
 			<div class="card-container" ng-show="game.getCurrentPlayer().isHuman && game.state === 'BUY'">
 				<h4>Cards for Sale</h4>
@@ -44,12 +51,6 @@
 				<div class="no-cards" ng-if="game.getCurrentPlayer().getAffordableCards(game).length === 0">You can't buy any cards</div>
 			</div>
 
-			<div id="state-panel">
-				<span>Game State: {{ game.state }}</span>
-				<span id="dice-roll" ng-show="game.lastRoll !== null">Last Roll: {{ game.lastRoll.join(", ") }}</span>
-				<span id="turn-number">Turn Number {{ game.turn }}</span>
-			</div>
-
 			<div id="btn-panel">
 				<button class="btn btn-default" ng-click="game.rollDice()" ng-disabled="game.state !== 'ROLL'">Roll</button>
 				<button class="btn" ng-click="game.evalStrat()"
@@ -60,12 +61,6 @@
 				<span ng-if="game.hasHumanPlayers()">
 					<button class="btn btn-success" ng-click="game.skipBotTurns()"
 						    ng-disabled="game.state !== 'ROLL' || game.getCurrentPlayer().isHuman">Skip Bot Turns</button>
-				</span>
-				<button class="btn btn-primary" ng-click="game.doTurn()" 
-				        ng-disabled="game.state !== 'ROLL' || game.getCurrentPlayer().isHuman">Full Turn</button>
-				<span ng-if="! game.hasHumanPlayers()">
-					<button class="btn btn-success" ng-click="game.playGame()"
-					        ng-disabled="game.state !== 'ROLL' || game.hasHumanPlayers()">Full Game</button>
 				</span>
 
 			</div>

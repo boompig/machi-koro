@@ -43,6 +43,10 @@ Card.prototype.isGrey = function () {
 	return this.color === colors.GREY;
 };
 
+Card.prototype.isFactory = function () {
+	return this.category === categories.FACTORY || this.category === categories.PRODUCE_FACTORY;
+};
+
 var categories = {
 	WHEAT: "WHEAT",
 	PIG: "PIG",

@@ -14,7 +14,9 @@ function saveWeights(weights) {
 function getController () {
 	// command-line invocation of MachiKoro
 	var scope = {};
-	return new mc.MachiKoroCtrl(scope);
+	var ctrl = new mc.MachiKoroCtrl(scope);
+	ctrl.initGame();
+	return ctrl;
 }
 
 /**
@@ -31,7 +33,7 @@ function runSimul(winners) {
 	var wp = ctrl.getCurrentPlayer();
 	wp.feedbackCardWeights();
 
-	oldWeights[wp.stratGroup] = wp.cardWeights;
+	oldWeights[wp.name] = wp.cardWeights;
 	
 	// console.log("*** WINNING WEIGHTS FOR " + wp.name + " ***");
 	// console.log(wp.cardWeights);
@@ -44,6 +46,7 @@ function initWinners() {
 	var ctrl = getController();
 
 	var winners = {};
+
 	for (var p = 0; p < ctrl.players.length; p++) {
 		var name = ctrl.players[p].name;
 		winners[name] = 0;
@@ -85,7 +88,7 @@ function printResults(winners, avgTurns, numIterations) {
 	console.log("Winning stats:");
 	var names = Object.keys(winners);
 	var sortedNames = names.sort(function (a, b) {
-		return winners[b] - winners[a]
+		return winners[b] - winners[a];
 	});
 	for (var i = 0; i < sortedNames.length; i++) {
 		var n = winners[sortedNames[i]];
