@@ -156,6 +156,10 @@ Player.prototype.getStealPlayerTargetMoney = function (gameState, cardYield) {
 	return name;
 };
 
+Player.prototype.canRollTwoDice = function () {
+	return this.hasCard("TRAIN_STATION");
+};
+
 /**
  * Return number of dice for this player to roll
  * TODO make a decision about whether to roll 2 dice or 1

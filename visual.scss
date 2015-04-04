@@ -1,0 +1,163 @@
+/**
+ * Globals
+ */
+
+.section-title {
+	margin: 2px auto;
+	text-align: center;
+}
+
+.card-img {
+	height: 200px;
+}
+
+.vis-card {
+	float: left;
+	display: inline;
+}
+
+.vis-card .card-name {
+	text-align: center;
+	margin: 2px auto;
+}
+
+img.disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+/**
+ * Not-globals
+ */
+
+#dice-panel {
+	display: block;
+	clear: both;
+	// position: fixed;
+	// left: 49%;
+	// top: 100px;
+
+	img {
+		margin: 0;
+		padding: 0;
+	}
+
+	.dice-img {
+		height: 100px;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+}
+
+#main-container {
+	margin: 10px auto;
+	width: 1200px;
+}
+
+#deck-container {
+	margin: 0;
+	padding: 0;
+	width: 430px;
+
+	display: inline-block;
+	height: 600px;
+	overflow: auto;
+	vertical-align: top;
+
+	.card-img {
+		height: 200px;
+	}
+
+	.vis-card .card-name {
+		font-size: 0.9em;
+	}
+
+	.selectable-card:not(.disabled) {
+		cursor: pointer;
+	}
+}
+
+#btn-panel {
+	clear: both;
+	display: block;
+	width: 100%;
+}
+
+#player-container {
+	clear: both;
+	display: inline-block;
+	vertical-align: top;
+	padding: 0;
+	margin: 0;
+	width: 700px;
+	height: 600px;
+	overflow: auto;
+
+	// .player:not(.playerTurn) {
+	// 	background-color: #eee;
+	// 	border-radius: 5px;
+	// 	border: 1px solid black;
+	// 	padding: 5px 0px 5px 40px;
+	// 	margin-bottom: 5px;
+	// }
+
+	.player-name {
+		font-size: 1.2em;
+		font-weight: default;
+	}
+
+	.plus-money {
+		color: green;
+	}
+
+	.minus-money {
+		color: red;
+	}
+
+	.player-name.playerTurn {
+		color: red;
+	}
+
+	.player-cards {
+		display: block;
+		clear: both;
+	}
+
+	.card {
+		.card-yield, .card-name {
+			font-size: 0.9em;
+			text-align: center;
+		}
+
+		.card-yield {
+			margin: 0;
+		}
+	}
+
+	.player-after {
+		clear: both;
+	}
+}
+
+/**
+ * Animation
+ */
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(40px, -60px)
+	}
+}
+
+.fadeOut {
+	animation-name: fadeOut;
+	animation-duration: 3000ms;
+	opacity: 0;
+	font-size: 2em;
+	height: 0;
+}

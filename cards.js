@@ -1,6 +1,17 @@
 "use strict";
 
 /**
+ * @param target: One of 'your_turn', 'all_turns', 'others_turn'
+ * @param amt: Amt that the card yields
+ * @param yieldType: 'normal' or 'stolen'
+ */
+function Yield (condition, amt, yieldType) {
+	this.condition = condition;
+	this.amt = amt;
+	this.yieldType = yieldType;
+}
+
+/**
  * @param category: ['all', 'current', <name>]
  * @param amt: Amount to steal
  * @param card: name of card to steal, or null
@@ -14,13 +25,14 @@ function Stolen (category, amt, card) {
 /**
  * A card in the game of Machi Koro
  */
-function Card (name, cost, card_yield, color, roll, category) {
+function Card (name, cost, card_yield, color, roll, category, description) {
 	this.name = name;
 	this.cost = cost;
 	this.card_yield = card_yield;
 	this.color = color;
 	this.roll = roll;
 	this.category = category;
+	this.description = description;
 }
 
 /**
@@ -72,11 +84,11 @@ var colors = {
  * TODO these do not include purple cards
  */
 var cards = {
-	WHEAT_FIELD: new Card("Wheat Field", 1, 1, colors.BLUE, [1], categories.WHEAT),
-	LIVESTOCK_FARM: new Card("Livestock Farm", 1, 1, colors.BLUE, [2], categories.PIG),
-	BAKERY: new Card("Bakery", 1, 1, colors.GREEN, [2, 3], categories.BAKERY),
-	CAFE: new Card("Cafe", 2, 1, colors.RED, [3], categories.CAFE),
-	CONVENIENCE_STORE: new Card("Convenience Store", 2, 3, colors.GREEN, [4], categories.BAKERY),
+	WHEAT_FIELD: new Card("Wheat Field", 1, 1, colors.BLUE, [1], categories.WHEAT, "Receive 1 coin from the bank regardless of whose turn it is."),
+	LIVESTOCK_FARM: new Card("Livestock Farm", 1, 1, colors.BLUE, [2], categories.PIG, "Receive 1 coin from the bank regardless of whose turn it is."),
+	BAKERY: new Card("Bakery", 1, 1, colors.GREEN, [2, 3], categories.BAKERY, "Receive 1 coin from the bank if it’s your turn."),
+	CAFE: new Card("Cafe", 2, 1, colors.RED, [3], categories.CAFE, "Receive 1 coin from any player who rolls this number."),
+	CONVENIENCE_STORE: new Card("Convenience Store", 2, 3, colors.GREEN, [4], categories.BAKERY, "Receive 3 coins from the bank if it’s your turn."),
 	FOREST: new Card("Forest", 3, 1, colors.BLUE, [5], categories.GEAR),
 	CHEESE_FACTORY: new Card("Cheese Factory", 5, 3, colors.GREEN, [7], categories.FACTORY),
 	FURNITURE_FACTORY: new Card("Furniture Factory", 3, 3, colors.GREEN, [8], categories.FACTORY),

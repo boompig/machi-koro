@@ -4,7 +4,7 @@
 		<title>Machi Koro Simulation</title>
 		<meta charset="utf-8" />
 
-		<link rel="stylesheet" href="style.css" />
+		<!-- <link rel="stylesheet" href="style.css" /> -->
 
 		<!-- CDN-hosted bootstrap -->
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
@@ -13,54 +13,65 @@
 	</head>
 	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
 		<div id="main-container">
-			<div id="player-container">
-				<div class="player" ng-repeat="player in game.players">
-					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
-						<span>{{ player.name }}</span>
-						<span ng-show="! player.isHuman">(Bot)</span>
-					</div>
-					<div class="player-money">Money: {{ player.money }}</div>
-					<div class="player-cards">
-						<h5>Cards</h5>
-						<div class="card-container">
-							<div class="card" ng-repeat="(cardName, num) in player.cards" ng-class="getCardClass(cardName)">
-								<span class="card-rolls">[{{ getCardRolls(cardName) }}]</span>&nbsp;
-								<span class="card-name">{{ cardName }}</span>&nbsp;
-								<span class="card-count">x {{ num }}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<div id="dice-panel">
 				<span  ng-if="game.lastRoll !== null">
 					<img class="dice-img" ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
 					<img class="dice-img" ng-if="game.lastRoll.length > 1" ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
 				</span>
 			</div>
-			
-			<div id="buy-card-container" class="card-container" ng-show="game.getCurrentPlayer().isHuman && game.state === 'BUY'">
-				<h4>Cards for Sale</h4>
-				<div class="card selectable-card" ng-repeat="cardName in game.getCurrentPlayer().getAffordableCards(game)"
-				ng-click="game.buyCard(cardName, game.getCurrentPlayer())">
-				    <img class="card-img" ng-src="images/cards/{{ cardName.toLowerCase() }}" />
-				    <div class="card-name">{{ getCardName(cardName) }}</div>
-					<!-- <span class="card-name">{{ cardName }}</span>&nbsp;
-					<span class="card-cost">(costs {{ getCardCost(cardName) }} coins)</span>&nbsp;
-					<span class="card-rolls">[yields {{ getCardRolls(cardName) }} coins]</span>&nbsp;
-					<span class="card-remain"> - {{ game.deck[cardName] }} remaining</span> -->
+
+			<div id="deck-container">
+				<h4 class="section-title">Deck</h4>
+				<div class="card vis-card" ng-repeat="cardName in getDeck(game)">
+					<img class="card-img selectable-card" ng-src="images/cards/{{ cardName.toLowerCase() }}" alt="{{ getCardDescription(cardName) }}"
+					ng-class="{ disabled: (!game.canBuyCard(cardName, game.getCurrentPlayer()) || !game.getCurrentPlayer().isHuman) }"
+					ng-click="game.buyCard(cardName, game.getCurrentPlayer())" />
+					<div class="card-name">
+						<span>{{ getDeckQty(game, cardName) }} x</span>
+						<span>{{ getCardName(cardName) }}</span>
+					</div>
 				</div>
-				<div class="no-cards" ng-if="game.getCurrentPlayer().getAffordableCards(game).length === 0">You can't buy any cards</div>
+			</div>
+
+			<div id="player-container">
+				<div class="player" ng-repeat="player in game.players" id="{{ player.name }}"
+					ng-class="{ playerTurn: game.isPlayerTurn(player) }">
+					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">{{ player.name }}</div>
+
+					<div class="plus-money" ng-show="plusMoney[player.name]"
+					ng-class="{ fadeOut: plusMoney[player.name] }">+{{ plusMoney[player.name] }}</div>
+					<div class="minus-money" ng-show="minusMoney[player.name]"
+					ng-class="{ fadeOut: minusMoney[player.name] }">-{{ minusMoney[player.name] }}</div>
+
+					<div class="player-money">Money: {{ player.money }}</div>
+					<div class="player-cards"><!-- ng-show="game.isPlayerTurn(player) || playerShown === player"> -->
+						<div ng-repeat="cardName in getSortedPlayerCards(player)" class="card vis-card">
+							<img class="card-img" ng-src="images/cards/{{ cardName }}.png" alt="{{ getCardDescription(cardName) }}" />
+							<div class="card-name">
+								<span>{{ getCardQty(cardName, player) }} x</span>
+								<span>{{ getCardName (cardName) }}</span>
+							</div>
+							<div class="card-yield">
+								<span>Yields {{ game.getCardYield(player, cardName) ? game.getCardYield(player, cardName).amt : "nothing" }}</span>
+							</div>
+						</div>
+					</div>
+					<!--<div class="player-cards-noshow" ng-show="!game.isPlayerTurn(player) && playerShown !== player">
+						<span>{{ getSortedPlayerCards(player).length }} cards</span>
+					</div>-->
+					<div class="player-after"></div>
+				</div>
 			</div>
 
 			<div id="btn-panel">
 				<span ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
-					<button class="btn btn-default" ng-click="game.rollDice()" ng-disabled="game.state !== 'ROLL'">Roll</button>
-					<button class="btn btn-danger" ng-click="game.evalStrat()" ng-disabled="game.state !== 'BUY'">End Turn</button>
+					<button class="btn btn-primary" ng-click="game.rollDice(1)" ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
+					<button class="btn btn-primary" ng-click="game.rollDice(2)"
+					ng-disabled="game.state !== 'ROLL' || !game.getCurrentPlayer().canRollTwoDice()">Roll 2 Dice</button>
+					<button class="btn btn-danger" ng-click="endHumanTurn(game)" ng-disabled="game.state !== 'BUY'">End Turn</button>
 				</span>
 				<span ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
-					<button class="btn btn-default" ng-click="game.doTurn()" ng-disabled="game.state !== 'ROLL'">Evaluate Bot Turn</button>
+					<button class="btn btn-primary" ng-click="doTurn(game)" ng-disabled="game.state !== 'ROLL'">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
 				</span>
 			</div>
 		</div>

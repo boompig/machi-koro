@@ -9,7 +9,7 @@ html, body {
 }
 
 #player-container {
-	min-height: 400px;
+	/*min-height: 400px;*/
 	clear: both;
 	display: block;
 }
