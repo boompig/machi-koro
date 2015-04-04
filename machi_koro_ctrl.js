@@ -53,6 +53,19 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		$anchorScroll(name);
 	};
 
+	$scope.newGame = function (game) {
+		if (game.state !== states.GG) {
+			var yn = confirm("Are you sure you want to abandon this game?");
+			if (yn) {
+				var url = window.location.href.split("#")[0];
+				window.location.href = url;
+			}
+		} else {
+			var url = window.location.href.split("#")[0];
+			window.location.href = url;
+		}
+	};
+
 	/**
 	 * Wrapper for AI turn on UI
 	 */

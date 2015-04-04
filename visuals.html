@@ -55,9 +55,6 @@
 							</div>
 						</div>
 					</div>
-					<!--<div class="player-cards-noshow" ng-show="!game.isPlayerTurn(player) && playerShown !== player">
-						<span>{{ getSortedPlayerCards(player).length }} cards</span>
-					</div>-->
 					<div class="player-after"></div>
 				</div>
 			</div>
@@ -68,6 +65,7 @@
 					<button class="btn btn-primary" ng-click="game.rollDice(2)"
 					ng-disabled="game.state !== 'ROLL' || !game.getCurrentPlayer().canRollTwoDice()">Roll 2 Dice</button>
 					<button class="btn btn-danger" ng-click="endHumanTurn(game)" ng-disabled="game.state !== 'BUY'">End Turn</button>
+					<button class="btn btn-info" ng-click="newGame(game)">New Game</button>
 				</span>
 				<span ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
 					<button class="btn btn-primary" ng-click="doTurn(game)" ng-disabled="game.state !== 'ROLL'">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>

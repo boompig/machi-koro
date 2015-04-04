@@ -1,4 +1,9 @@
 /**
+ * Variables
+ */
+$height: 700px;
+
+/**
  * Globals
  */
 
@@ -55,7 +60,7 @@ img.disabled {
 	width: 430px;
 
 	display: inline-block;
-	height: 600px;
+	height: $height;
 	overflow: auto;
 	vertical-align: top;
 
@@ -76,6 +81,13 @@ img.disabled {
 	clear: both;
 	display: block;
 	width: 100%;
+
+	margin: 10px auto;
+	text-align: center;
+
+	.btn {
+		margin-left: 5px;
+	}
 }
 
 #player-container {
@@ -85,16 +97,8 @@ img.disabled {
 	padding: 0;
 	margin: 0;
 	width: 700px;
-	height: 600px;
+	height: $height;
 	overflow: auto;
-
-	// .player:not(.playerTurn) {
-	// 	background-color: #eee;
-	// 	border-radius: 5px;
-	// 	border: 1px solid black;
-	// 	padding: 5px 0px 5px 40px;
-	// 	margin-bottom: 5px;
-	// }
 
 	.player-name {
 		font-size: 1.2em;
