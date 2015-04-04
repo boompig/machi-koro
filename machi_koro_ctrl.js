@@ -42,11 +42,15 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	$scope.minusMoney = {};
 
 	$scope.playerShown = null;
+	$scope.animateDice = false;
+	$scope.animateDiceInterval = 2500;
 
 	$scope.scrollToCurrentPlayer = function (game) {
-		$location.hash(game.getCurrentPlayer().name);
-		console.log("scrolling to " + game.getCurrentPlayer().name);
-		$anchorScroll();
+		var name = game.getCurrentPlayer().name;
+		$location.hash(name);
+		// console.log($location.hash());
+		console.log("scrolling to " + name);
+		$anchorScroll(name);
 	};
 
 	/**
@@ -411,10 +415,20 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		return stolen;
 	};
 
+	/**
+	 * Roll a single die and return the result (1-6)
+	 */
 	this.rollDie = function () {
 		return Math.ceil(Math.random() * 6);
 	};
 
+	/**
+	 * Return an array of dice rolls. If n is not specified, query how many dice to roll.
+	 * For human player, query with UI. For bot, ask the decision engine.
+	 * 
+	 * @param  {Number} n 	optional - number of dice to roll
+	 * @return {Array}    	Array of dice roll results
+	 */
 	this.getDiceRoll = function (n) {
 		var currentPlayer = this.getCurrentPlayer();
 		var numDice;
@@ -432,14 +446,30 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		return rollArray;
 	};
 
+	$scope.animateDiceRoll = function () {
+		$scope.animateDice = true;
+		$timeout(function () {
+			$scope.animateDice = false;
+		}, $scope.animateDiceInterval);
+	};
+
 	/**
 	 * Roll the dice.
 	 * Called at the beginning of a player's turn.
 	 * Evaluate card effects.
 	 */
 	this.rollDice = function (n) {
+		if (this.hasHumanPlayers()) {
+			$scope.animateDice = false;
+		}
+
 		var player = this.getCurrentPlayer();
 		var rollArray = this.getDiceRoll(n);
+
+		if (this.hasHumanPlayers()) {
+			$scope.animateDiceRoll();
+		}
+
 		if (player.hasCard("RADIO_TOWER")) {
 			if (player.isHuman) {
 				if ($scope.decideHumanReroll(rollArray)) {

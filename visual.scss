@@ -30,19 +30,13 @@ img.disabled {
  * Not-globals
  */
 
-#dice-panel {
+#dice-container {
 	display: block;
 	clear: both;
-	// position: fixed;
-	// left: 49%;
-	// top: 100px;
+	position: fixed;
+	left: 75%;
 
-	img {
-		margin: 0;
-		padding: 0;
-	}
-
-	.dice-img {
+	img.dice-img {
 		height: 100px;
 		margin: 0;
 		padding: 0;
@@ -160,4 +154,57 @@ img.disabled {
 	opacity: 0;
 	font-size: 2em;
 	height: 0;
+}
+
+@keyframes gameOver {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.gameOver {
+	animation-name: gameOver;
+	animation-duration: 2000ms;
+	font-size: 4em;
+	position: fixed;
+	color: red;
+	// left: 40%;
+	top: 50%;
+	z-index: 100;
+
+	background-color: black;
+	width: 100%;
+	text-align: center;
+
+	transform: rotate(45deg);
+	padding: 0;
+	margin: 0;
+	// height: 30px;
+	vertical-align: middle;
+}
+
+@keyframes newDice {
+	0% {
+		opacity: 0;
+		position: fixed;
+		transform: translate(-500px, 300px) scale(2, 2);
+		// height: 200px;
+	}
+
+	25% {
+		opacity: 1;
+		transform: translate(-500px, 300px) scale(2, 2);
+	}
+
+	100% {
+	}
+}
+
+#dice-container.newDice {
+	animation-name: newDice;
+	animation-duration: 2200ms;
 }

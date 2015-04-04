@@ -3,9 +3,6 @@
 	<head>
 		<title>Machi Koro Simulation</title>
 		<meta charset="utf-8" />
-
-		<!-- <link rel="stylesheet" href="style.css" /> -->
-
 		<!-- CDN-hosted bootstrap -->
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
 
@@ -13,10 +10,12 @@
 	</head>
 	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
 		<div id="main-container">
-			<div id="dice-panel">
+			<div id="dice-container" ng-class="{ newDice: animateDice }">
 				<span  ng-if="game.lastRoll !== null">
-					<img class="dice-img" ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
-					<img class="dice-img" ng-if="game.lastRoll.length > 1" ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
+					<img class="dice-img" 
+					ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
+					<img class="dice-img" ng-if="game.lastRoll.length > 1"
+					ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
 				</span>
 			</div>
 
@@ -74,6 +73,9 @@
 					<button class="btn btn-primary" ng-click="doTurn(game)" ng-disabled="game.state !== 'ROLL'">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
 				</span>
 			</div>
+
+			<div id="game-over" ng-show="game.state === 'GAME_OVER'"
+			ng-class="{ gameOver : game.state === 'GAME_OVER' }">Game Over</div>
 		</div>
 
 		<!-- google-hosted JQuery and Angular -->
