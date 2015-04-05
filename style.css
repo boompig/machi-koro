@@ -14,6 +14,11 @@ html, body {
 	display: block;
 }
 
+#player-container .last-player {
+	clear: both;
+	display: block;
+}
+
 .player {
 	float: left;
 	width: 22%;

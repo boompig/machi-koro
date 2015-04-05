@@ -33,7 +33,8 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		"Daniel",
 		"Sergei",
 		"Alexey",
-		"Ross"
+		// "Ross"
+		"Rich"
 	];
 
 	this.humanPlayers = [];
@@ -85,16 +86,18 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	 */
 	$scope.onLoad = function (game) {
 		var s = window.location.search.split("?")[1];
-		var name = s.split("=")[1];
-		var idx = game.playerNames.indexOf(name)
-		if (idx < 0) {
-			console.log("Adding new player " + name);
-			// displace one of the players at random
-			idx = Math.randInt(0, this.playerNames.length);
-			game.playerNames[idx] = name;
-		} else {
-			console.log("Replacing existing player " + name);
-			game.humanPlayers.push(idx);
+		if (s) {
+			var name = s.split("=")[1];
+			var idx = game.playerNames.indexOf(name)
+			if (idx < 0) {
+				console.log("Adding new player " + name);
+				// displace one of the players at random
+				idx = Math.randInt(0, this.playerNames.length);
+				game.playerNames[idx] = name;
+			} else {
+				console.log("Replacing existing player " + name);
+				game.humanPlayers.push(idx);
+			}
 		}
 		game.initGame();
 	};
@@ -283,16 +286,23 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	};
 
 	this.earnMoney = function (player, amt) {
-		if (this.hasHumanPlayers()) {
-			$scope.animateEarnMoney(player, amt);
-		}
 		player.money += amt;
 	};
 
+	/**
+	 * @param {String} cardName 		Name of the card to evaluate
+	 * @param {Player} player 			Player who owns the card
+	 * @param {Number} cafeBakeryBonus	Bonus (if any) to bakeries/cafes owned by this player
+	 * @param {Boolean} playerTurn		True iff it's this player's turn
+	 * @param {Array}	stolen 			Array of Stolen objects
+	 *
+	 * @return Total amount earned via this card, if any
+	 */
 	this.evalCard = function (cardName, player, cafeBakeryBonus, playerTurn, stolen) {
 		var card = cards[cardName];
 		var cardYield = card.card_yield;
 		var numCard = player.cards[cardName];
+		var totalYield = 0;
 
 		if (card.category === categories.CAFE || card.category === categories.BAKERY) {
 			cardYield += cafeBakeryBonus;
@@ -304,16 +314,18 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		switch(card.color) {
 			case colors.GREEN:
 				if (card.isFactory()) {
-					var totalYield = this.evalFactory(player, cardName, cardYield);
+					totalYield = this.evalFactory(player, cardName, cardYield);
 					this.earnMoney(player, totalYield);
 				} else {
-					this.writeLog(player, "Got " + (cardYield * numCard) + " coins from " + numCard + " x " + cardName);
-					this.earnMoney(player, cardYield * numCard);
+					totalYield = cardYield * numCard;
+					this.writeLog(player, "Got " + totalYield + " coins from " + numCard + " x " + cardName);
+					this.earnMoney(player, totalYield);
 				}
 				break;
 			case colors.BLUE:
-				this.writeLog(player, "Got " + (cardYield * numCard) + " coins from " + numCard + " x " + cardName);
-				this.earnMoney(player, cardYield * numCard);
+				totalYield = (cardYield * numCard);
+				this.writeLog(player, "Got " + totalYield + " coins from " + numCard + " x " + cardName);
+				this.earnMoney(player, totalYield);
 				break;
 			case colors.PURPLE:
 				switch (cardName) {
@@ -347,7 +359,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 				// do nothing
 				break;
 		}
-		return stolen;
+		return totalYield;
 	};
 
 	this.getCardYield = function (player, cardName) {
@@ -414,15 +426,20 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		if (player.hasCard("SHOPPING_MALL")) {
 			cafeBakeryBonus = 1;
 		}
+		var total = 0;
 
 		for (var cardName in player.cards) {
 			if (player.cards.hasOwnProperty(cardName)) {
 				var card = cards[cardName];
 
 				if (card.hasEffect(diceRoll, playerTurn)) {
-					this.evalCard(cardName, player, cafeBakeryBonus, playerTurn, stolen);
+					total += this.evalCard(cardName, player, cafeBakeryBonus, playerTurn, stolen);
 				}
 			}
+		}
+
+		if (this.hasHumanPlayers() && total > 0) {
+			$scope.animateEarnMoney(player, total);
 		}
 
 		return stolen;
@@ -705,6 +722,9 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 			this.players[idx].isHuman = true;
 			console.log("Set " + this.players[idx].name + " to human");
 		}
+
+		// shuffle players to get randomized start order
+		Math.shuffle(this.players);
 
 		for (var i = 0; i < this.players.length; i++) {
 			this.dealCard("WHEAT_FIELD", this.players[i]);

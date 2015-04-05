@@ -10,6 +10,10 @@
 
 * BUSINESS_COMPLEX
 
+# Animation Issues
+
+* the +/- popups are per-card rather than per-turn
+
 # AI
 
 * after each game, the winning AI adds +1 to the weights of each card they used to win

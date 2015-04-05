@@ -9,7 +9,7 @@
 		<!-- CDN-hosted bootstrap -->
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
 	</head>
-	<body ng-controller="MachiKoroCtrl as game">
+	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
 		<div id="main-container">
 			<h2>Machi Koro simulation</h2>
 
@@ -30,6 +30,7 @@
 						</div>
 					</div>
 				</div>
+				<div class="last-player"></div>
 			</div>
 			
 			<div class="card-container" ng-show="game.getCurrentPlayer().isHuman && game.state === 'BUY'">
@@ -38,7 +39,7 @@
 				     ng-class="getCardClass(cardName)" ng-click="game.buyCard(cardName, game.getCurrentPlayer())">
 					<span class="card-name">{{ cardName }}</span>&nbsp;
 					<span class="card-cost">(costs {{ getCardCost(cardName) }} coins)</span>&nbsp;
-					<span class="card-rolls">[yields {{ getCardRolls(cardName) }} coins]</span>&nbsp;
+					<span class="card-rolls">[rolls {{ getCardRolls(cardName) }}]</span>&nbsp;
 					<span class="card-remain"> - {{ game.deck[cardName] }} remaining</span>
 				</div>
 				<div class="no-cards" ng-if="game.getCurrentPlayer().getAffordableCards(game).length === 0">You can't buy any cards</div>
