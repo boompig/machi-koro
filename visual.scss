@@ -33,13 +33,13 @@ img.disabled {
 
 /**
  * Not-globals
- */
+ */	
 
 #dice-container {
 	display: block;
 	clear: both;
 	position: fixed;
-	left: 75%;
+	left: 84%;
 
 	img.dice-img {
 		height: 100px;
@@ -51,7 +51,7 @@ img.disabled {
 
 #main-container {
 	margin: 10px auto;
-	width: 1200px;
+	width: 1300px;
 }
 
 #deck-container {
@@ -96,7 +96,7 @@ img.disabled {
 	vertical-align: top;
 	padding: 0;
 	margin: 0;
-	width: 700px;
+	width: 670px;
 	height: $height;
 	overflow: auto;
 
@@ -123,6 +123,11 @@ img.disabled {
 	}
 
 	.card {
+
+		img {
+			// height: 100px;
+		}
+
 		.card-yield, .card-name {
 			font-size: 0.9em;
 			text-align: center;
@@ -204,11 +209,16 @@ img.disabled {
 		transform: translate(-500px, 300px) scale(2, 2);
 	}
 
+	40% {
+		opacity: 1;
+		transform: translate(-500px, 300px) scale(2, 2);
+	}
+
 	100% {
 	}
 }
 
 #dice-container.newDice {
 	animation-name: newDice;
-	animation-duration: 2200ms;
+	animation-duration: 1900ms;
 }

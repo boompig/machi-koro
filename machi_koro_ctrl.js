@@ -43,7 +43,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 
 	$scope.playerShown = null;
 	$scope.animateDice = false;
-	$scope.animateDiceInterval = 2500;
+	$scope.animateDiceInterval = 2000;
 
 	$scope.scrollToCurrentPlayer = function (game) {
 		var name = game.getCurrentPlayer().name;

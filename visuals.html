@@ -43,7 +43,7 @@
 					ng-class="{ fadeOut: minusMoney[player.name] }">-{{ minusMoney[player.name] }}</div>
 
 					<div class="player-money">Money: {{ player.money }}</div>
-					<div class="player-cards"><!-- ng-show="game.isPlayerTurn(player) || playerShown === player"> -->
+					<div class="player-cards">
 						<div ng-repeat="cardName in getSortedPlayerCards(player)" class="card vis-card">
 							<img class="card-img" ng-src="images/cards/{{ cardName }}.png" alt="{{ getCardDescription(cardName) }}" />
 							<div class="card-name">
@@ -61,15 +61,18 @@
 
 			<div id="btn-panel">
 				<span ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
-					<button class="btn btn-primary" ng-click="game.rollDice(1)" ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
-					<button class="btn btn-primary" ng-click="game.rollDice(2)"
+					<button class="btn btn-primary" ng-click="game.rollDice(1)" ng-show="game.state === 'ROLL'"
+					ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
+					<button class="btn btn-primary" ng-click="game.rollDice(2)" ng-show="game.state === 'ROLL'"
 					ng-disabled="game.state !== 'ROLL' || !game.getCurrentPlayer().canRollTwoDice()">Roll 2 Dice</button>
-					<button class="btn btn-danger" ng-click="endHumanTurn(game)" ng-disabled="game.state !== 'BUY'">End Turn</button>
-					<button class="btn btn-info" ng-click="newGame(game)">New Game</button>
+					<button class="btn btn-danger" ng-click="endHumanTurn(game)" ng-show="game.state === 'BUY'"
+					ng-disabled="game.state !== 'BUY'">End Turn</button>
 				</span>
 				<span ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
-					<button class="btn btn-primary" ng-click="doTurn(game)" ng-disabled="game.state !== 'ROLL'">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
+					<button class="btn btn-primary" ng-click="doTurn(game)"
+					ng-disabled="game.state !== 'ROLL' || animateDice">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
 				</span>
+				<button class="btn btn-info" ng-click="newGame(game)">New Game</button>
 			</div>
 
 			<div id="game-over" ng-show="game.state === 'GAME_OVER'"
