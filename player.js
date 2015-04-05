@@ -15,6 +15,7 @@ if (require) {
 
 function Player (name, weights) {
 	"use strict";
+
 	this.name = name;
 	this.cards = {};
 	this.money = 0;
@@ -24,19 +25,51 @@ function Player (name, weights) {
 	// for AI?
 	weights = weights || {};
 	this.cardWeights = weights[name] || {};
+	// console.log(this.cardWeights);
 
 	if (Object.keys(this.cardWeights).length === 0) {
-		for (var cardName in cards) {
-			this.cardWeights[cardName] = 1;
-		}
+		this.initWeights();
 	} else {
+		this.fillWeights();
+	}
+
+	this.purchaseHistory = {};
+}
+
+Player.prototype.saveBuyCard = function (cardName) {
+	"use strict";
+	if (! this.purchaseHistory.hasOwnProperty(this.points)) {
+		this.purchaseHistory[this.points] = {};
+	}
+	if (! this.purchaseHistory[this.points].hasOwnProperty(cardName)) {
+		this.purchaseHistory[this.points][cardName] = 0;
+	}
+	this.purchaseHistory[this.points][cardName]++;
+};
+
+Player.prototype.initWeights = function () {
+	"use strict";
+	// 4 = maxPoints
+	for (var p = 0; p <= 4; p++) {
+		this.cardWeights[p] = {};
 		for (var cardName in cards) {
-			if (! this.cardWeights.hasOwnProperty(cardName)) {
-				this.cardWeights[cardName] = 0;
+			this.cardWeights[p][cardName] = 1;
+		}
+	}
+};
+
+Player.prototype.fillWeights = function () {
+	"use strict";
+	// 4 = maxPoints
+	for (var p = 0; p <= 4; p++) {
+		for (var cardName in cards) {
+			if (! this.cardWeights[p].hasOwnProperty(cardName)) {
+				console.log("Reset " + p + "_" + cardName);
+				this.cardWeights[p][cardName] = 1;
 			}
 		}
 	}
-}
+};
 
 /**
  * This function is called once the game is over.
@@ -46,23 +79,11 @@ function Player (name, weights) {
 Player.prototype.feedbackCardWeights = function () {
 	"use strict";
 	var cardName;
-	for (cardName in cards) {
-		if (! this.cards.hasOwnProperty(cardName)) {
-			// decay, but never decay to 0
-			if (this.cardWeights[cardName] > 1) {
-				this.cardWeights[cardName]--;
-			}
-		}
-	}
 
-	for (cardName in this.cards) {
-		if ((cardName === "WHEAT_FIELD" || cardName === "BAKERY") && this.cards[cardName] === 1) {
-			// decay, but never decay to 0
-			if (this.cardWeights[cardName] > 1) {
-				this.cardWeights[cardName]--;
-			}
-		} else {
-			this.cardWeights[cardName]++;
+	for (var p in this.purchaseHistory) {
+		for (cardName in this.purchaseHistory[p]) {
+			this.cardWeights[p][cardName]++;
+			console.log("+1 to " + cardName + " with " + p + " points - now at " + this.cardWeights[p][cardName]);
 		}
 	}
 };
@@ -115,15 +136,34 @@ Player.prototype.hasCard = function (cardName) {
 	return this.cards.hasOwnProperty(cardName);
 };
 
+/**
+ * Pick the card to buy, out of the list of affordable cards.
+ * Assume that canAffordCards.length > 0
+ */
 Player.prototype.pickBuyCard = function (canAffordCards) {
 	"use strict";
 	var cardName;
 	var a = [];
+
+	if (canAffordCards.length === 0) {
+		return null;
+	}
+
+	// extremely simple check to see if player can win the game immediately
+	if (this.points === 3) {
+		for (var i = 0; i < canAffordCards.length; i++) {
+			cardName = canAffordCards[i];
+			if (cards[cardName].color === colors.GREY) {
+				return cardName;
+			}
+		}
+	}
+
 	for (var i = 0; i < canAffordCards.length; i++) {
 		cardName = canAffordCards[i];
 
 		// add 1 card for each additional weight
-		for (var j = 0; j < this.cardWeights[cardName]; j++) {
+		for (var j = 0; j < this.cardWeights[this.points][cardName]; j++) {
 			a.push(cardName);
 		}
 	}

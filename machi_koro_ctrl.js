@@ -274,7 +274,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 			}
 		}
 		var totalYield = numCard * count * cardYield;
-		this.writeLog(player, numCard + " x " + cardName + " generated " + totalYield + " coins due to " + count + " " + targetCategory + " cards");
+		// this.writeLog(player, numCard + " x " + cardName + " generated " + totalYield + " coins due to " + count + " " + targetCategory + " cards");
 		return totalYield;
 	};
 
@@ -691,11 +691,15 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		}
 
 		var card = cards[cardName];
+		
+		player.money -= card.cost;
+		this.dealCard(cardName, player);
+		player.saveBuyCard(cardName);
+
+		// evaluate points after saving card
 		if (card.color === colors.GREY) {
 			player.points++;
 		}
-		player.money -= card.cost;
-		this.dealCard(cardName, player);
 	};
 
 	this.initGame = function () {
@@ -706,7 +710,12 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		this.deck = {};
 		for (var cardName in cards) {
 			if (cards.hasOwnProperty(cardName)) {
-				this.deck[cardName] = 6;
+				if (cards[cardName].color === colors.GREY) {
+					// supply is functionally infinite
+					this.deck[cardName] = 1000;
+				} else {
+					this.deck[cardName] = 6;
+				}
 			}
 		}
 
@@ -741,7 +750,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 			if (this.bonusTurn) {
 				console.log("[" + player.name + " on turn " + this.turn + " (bonus)] " + msg);
 			} else {
-				console.log("[" + player.name + " on turn " + this.turn + "] " + msg);
+				console.log("[" + player.name + " on turn " + this.turn + " with " + player.points + " points and " + player.money + " coins] " + msg);
 			}
 		}
 	};
