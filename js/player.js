@@ -149,6 +149,11 @@ Player.prototype.pickBuyCard = function (canAffordCards) {
 		return null;
 	}
 
+	if (this.points === 4) {
+		// no need to buy anything, already won
+		return null;
+	}
+
 	// extremely simple check to see if player can win the game immediately
 	if (this.points === 3) {
 		for (var i = 0; i < canAffordCards.length; i++) {

@@ -2,6 +2,7 @@ var fs = require("fs");
 var mc = require("./machi_koro_ctrl.js");
 
 var minReset = 5000;
+var minProgressIterations = 100;
 
 function readWeights() {
 	return JSON.parse(fs.readFileSync("./weights.js"));
@@ -148,6 +149,18 @@ function clone(obj) {
     throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
+function printProgress(iteration, maxIterations) {
+	if (iteration > 0) {
+		process.stdout.clearLine();
+		process.stdout.cursorTo(0)
+	}
+	var numBars = Math.floor((iteration + 1) / maxIterations * 10);
+	var numSpaces = 10 - numBars;
+	var bars = new Array(numBars + 1).join("=");
+	var spaces = new Array(numSpaces + 1).join(" ");
+	process.stdout.write("[" + bars + ">" + spaces + "]");
+}
+
 function main () {
 	var iterations = 1;
 	var logLevel = "defualt";
@@ -176,7 +189,13 @@ function main () {
 	for (var i = 0; i < iterations; i++) {
 		// var m = clone(oldWeights);
 		counter += runSimul(winners, oldWeights, logLevel);
+		if (iterations >= minProgressIterations && logLevel === "quiet") {
+			printProgress(i, iterations);
+		}
 		// computeWeightDiff(m, oldWeights);
+	}
+	if (iterations >= minProgressIterations && logLevel === "quiet") {
+		process.stdout.write("\n");
 	}
 	printResults(winners, counter/iterations, iterations);
 
