@@ -11,12 +11,15 @@ function saveWeights(weights) {
 	fs.writeFileSync("./weights.js", JSON.stringify(weights, null, 4));
 }
 
-function getController (weights) {
+function getController (weights, logLevel) {
 	// command-line invocation of MachiKoro
 	var scope = {};
 	var ctrl = new mc.MachiKoroCtrl(scope);
 	if (weights) {
 		ctrl.weights = weights;
+	}
+	if (logLevel) {
+		ctrl.setLogLevel(logLevel);
 	}
 	ctrl.initGame();
 	return ctrl;
@@ -27,13 +30,13 @@ function getController (weights) {
  * Modify oldWeights
  * @return Number of turns in the game
  */
-function runSimul(winners, oldWeights) {
-	var ctrl = getController(oldWeights);
+function runSimul(winners, oldWeights, logLevel) {
+	var ctrl = getController(oldWeights, logLevel);
 
 	ctrl.playGame();
 	var wp = ctrl.getCurrentPlayer();
 	// console.log(oldWeights[wp.name]);
-	wp.feedbackCardWeights();
+	wp.feedbackCardWeights(ctrl);
 
 	oldWeights[wp.name] = wp.cardWeights;
 	// console.log(oldWeights[wp.name]);
@@ -147,16 +150,32 @@ function clone(obj) {
 
 function main () {
 	var iterations = 1;
+	var logLevel = "defualt";
 	if (process.argv.length > 2) {
 		iterations = process.argv[2];
 	}
+	if (process.argv.length > 3) {
+		switch (process.argv[3]) {
+			case "-q":
+				logLevel = "quiet";
+				console.log("Running simulation silently...");
+				break;
+			case "-v":
+				logLevel = "verbose";
+				break;
+			default:
+				logLevel = "default";
+				break;
+		}
+	}
+
 	var oldWeights = readWeights();
 	var winners = initWinners();
 	var counter = 0;
 	console.log("Running simulation for " + iterations + " iterations");
 	for (var i = 0; i < iterations; i++) {
 		// var m = clone(oldWeights);
-		counter += runSimul(winners, oldWeights);
+		counter += runSimul(winners, oldWeights, logLevel);
 		// computeWeightDiff(m, oldWeights);
 	}
 	printResults(winners, counter/iterations, iterations);

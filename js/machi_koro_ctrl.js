@@ -25,6 +25,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 
 
 	this.STRICT = 10;
+	this.DEFAULT = 30;
 	this.DEBUG = 40;
 	this.VERBOSE = 50;
 	this.logLevel = this.DEBUG;
@@ -45,6 +46,20 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	$scope.playerShown = null;
 	$scope.animateDice = false;
 	$scope.animateDiceInterval = 2000;
+
+	this.setLogLevel = function (logLevel) {
+		switch (logLevel) {
+			case "quiet":
+				this.logLevel = this.STRICT;
+				break;
+			case "default":
+				this.logLevel = this.DEFAULT;
+				break;
+			case "verbose":
+				this.logLevel = this.VERBOSE;
+				break;
+		}
+	};
 
 	$scope.scrollToCurrentPlayer = function (game) {
 		var name = game.getCurrentPlayer().name;
@@ -744,7 +759,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	this.writeLog = function (player, msg, logLevel) {
 		"use strict";
 		if (! logLevel) {
-			logLevel = this.STRICT;
+			logLevel = this.DEFAULT;
 		}
 		if (this.logLevel >= logLevel) {
 			if (this.bonusTurn) {

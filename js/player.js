@@ -64,7 +64,7 @@ Player.prototype.fillWeights = function () {
 	for (var p = 0; p <= 4; p++) {
 		for (var cardName in cards) {
 			if (! this.cardWeights[p].hasOwnProperty(cardName)) {
-				console.log("Reset " + p + "_" + cardName);
+				// console.log("Reset " + p + "_" + cardName);
 				this.cardWeights[p][cardName] = 1;
 			}
 		}
@@ -76,14 +76,14 @@ Player.prototype.fillWeights = function () {
  * Add 1 to all cards the player owns
  * TODO for now, this is regardless of qty
  */
-Player.prototype.feedbackCardWeights = function () {
+Player.prototype.feedbackCardWeights = function (gameState) {
 	"use strict";
 	var cardName;
 
 	for (var p in this.purchaseHistory) {
 		for (cardName in this.purchaseHistory[p]) {
 			this.cardWeights[p][cardName]++;
-			console.log("+1 to " + cardName + " with " + p + " points - now at " + this.cardWeights[p][cardName]);
+			gameState.writeLog(this, "+1 to " + cardName + " with " + p + " points - now at " + this.cardWeights[p][cardName], gameState.VERBOSE);
 		}
 	}
 };
