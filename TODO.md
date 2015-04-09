@@ -20,32 +20,11 @@
 
 # Further AI Ideas
 
-* use a time-based approach
-    - keep track of cards bought and time at which they were bought
-    - on win, add +1 to card for each turn card was bought
-    - layout of AI looks like:
-        + {
-            * "turn_(n - 1)": {
-                - "FURNITURE_FACTORY": 2
-            * },
-            * "turn_(n)": {
-                - "SHOPPING_MALL": 3
-            * }
-        + }
-    - problems with this approach:
-        + turns do not necessarily exactly correspond to game state from game to game
-* use a points-based approach
-    - keep track of cards bought and points at time when card was bought
-    - on win, add +1 to card for each point at which card was bought
-    - layout of AI looks like:
-        + {
-            * "(0)_points": {
-                - "WHEAT": 2
-            * },
-            * "(1)_points": {
-                - "FURNITURE_FACTORY": 3
-            * }
-        + }
-    - issues with this approach:
-        + ... extra data to keep track...
-        + ???
+* add a concept of waiting/saving
+* keep track of money
+    - have a way to serialize player state into a string
+        + for now can be ($p_points_$c_coins)
+        + later can be bit array of cards, followed by _$c where $c is # of coins
+        + even later can incorporate data from all players
+* use genetic algorithm ideas
+    - remove non-determinism in decision-making, add mutation instead

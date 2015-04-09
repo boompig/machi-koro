@@ -1,8 +1,12 @@
+	"use strict";
+
+// actual program starts here
 var fs = require("fs");
 var mc = require("./machi_koro_ctrl.js");
 
 var minReset = 5000;
 var minProgressIterations = 100;
+var maxProgressBars = 20;
 
 function readWeights() {
 	return JSON.parse(fs.readFileSync("./weights.js"));
@@ -68,6 +72,7 @@ function getWorstPlayer(winners, numIterations) {
 		n = winners[playerName];
 		if (n < lowestScore) {
 			lowestPlayer = playerName;
+			lowestScore = n;
 		}
 	}
 	return lowestPlayer;
@@ -75,9 +80,8 @@ function getWorstPlayer(winners, numIterations) {
 
 function resetWorstPlayer(winners, numIterations) {
 	var weights = readWeights();
-	var ctrl = getController();
-
 	var playerName = getWorstPlayer(winners, numIterations);
+	console.log("Resetting weights for " + playerName);
 	weights[playerName] = {};
 	saveWeights(weights);
 }
@@ -101,6 +105,9 @@ function printResults(winners, avgTurns, numIterations) {
 	}
 }
 
+/**
+ * Used for debugging
+ */
 function computeWeightDiff (o1, o2) {
 	for (var playerName in o1) {
 		var w1 = o1[playerName];
@@ -115,47 +122,23 @@ function computeWeightDiff (o1, o2) {
 	}
 }
 
-function clone(obj) {
-    var copy;
-
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || "object" != typeof obj) return obj;
-
-    // Handle Date
-    if (obj instanceof Date) {
-        copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-
-    // Handle Array
-    if (obj instanceof Array) {
-        copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-
-    // Handle Object
-    if (obj instanceof Object) {
-        copy = {};
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy obj! Its type isn't supported.");
-}
-
 function printProgress(iteration, maxIterations) {
+	var getNumBars = function (i) {
+		return Math.floor((i + 1) / maxIterations * maxProgressBars);
+	};
+
+	var numBars = getNumBars(iteration);
+	var oldNumBars = getNumBars(iteration - 1);
+	if (iteration > 0 && numBars === oldNumBars) {
+		return;
+	}
+
 	if (iteration > 0) {
 		process.stdout.clearLine();
-		process.stdout.cursorTo(0)
+		process.stdout.cursorTo(0);
 	}
-	var numBars = Math.floor((iteration + 1) / maxIterations * 10);
-	var numSpaces = 10 - numBars;
+
+	var numSpaces = maxProgressBars - numBars;
 	var bars = new Array(numBars + 1).join("=");
 	var spaces = new Array(numSpaces + 1).join(" ");
 	process.stdout.write("[" + bars + ">" + spaces + "]");
@@ -187,12 +170,10 @@ function main () {
 	var counter = 0;
 	console.log("Running simulation for " + iterations + " iterations");
 	for (var i = 0; i < iterations; i++) {
-		// var m = clone(oldWeights);
 		counter += runSimul(winners, oldWeights, logLevel);
 		if (iterations >= minProgressIterations && logLevel === "quiet") {
 			printProgress(i, iterations);
 		}
-		// computeWeightDiff(m, oldWeights);
 	}
 	if (iterations >= minProgressIterations && logLevel === "quiet") {
 		process.stdout.write("\n");
