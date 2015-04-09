@@ -146,7 +146,7 @@ function printProgress(iteration, maxIterations) {
 
 function main () {
 	var iterations = 1;
-	var logLevel = "defualt";
+	var logLevel = "default";
 	if (process.argv.length > 2) {
 		iterations = process.argv[2];
 	}
