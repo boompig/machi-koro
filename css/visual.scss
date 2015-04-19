@@ -157,9 +157,24 @@ img.disabled {
 	}
 }
 
+@-webkit-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(40px, -60px)
+	}
+}
+
 .fadeOut {
 	animation-name: fadeOut;
 	animation-duration: 3000ms;
+
+	-webkit-animation-name: fadeOut;
+	-webkit-animation-duration: 3000ms;
+
 	opacity: 0;
 	font-size: 2em;
 	height: 0;
@@ -175,9 +190,23 @@ img.disabled {
 	}
 }
 
+@-webkit-keyframes gameOver {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
 .gameOver {
 	animation-name: gameOver;
 	animation-duration: 2000ms;
+
+	-webkit-animation-name: gameOver;
+	-webkit-animation-duration: 2000ms;
+
 	font-size: 4em;
 	position: fixed;
 	color: red;
@@ -194,6 +223,28 @@ img.disabled {
 	margin: 0;
 	// height: 30px;
 	vertical-align: middle;
+}
+
+@-webkit-keyframes newDice {
+	0% {
+		opacity: 0;
+		position: fixed;
+		transform: translate(-500px, 300px) scale(2, 2);
+		// height: 200px;
+	}
+
+	25% {
+		opacity: 1;
+		transform: translate(-500px, 300px) scale(2, 2);
+	}
+
+	40% {
+		opacity: 1;
+		transform: translate(-500px, 300px) scale(2, 2);
+	}
+
+	100% {
+	}
 }
 
 @keyframes newDice {
@@ -219,6 +270,15 @@ img.disabled {
 }
 
 #dice-container.newDice {
+	-webkit-animation-name: newDice;
+	-webkit-animation-duration: 1900ms;
+
 	animation-name: newDice;
 	animation-duration: 1900ms;
+}
+
+footer {
+	color: #777;
+	margin: 0 auto;
+	text-align: center;
 }
