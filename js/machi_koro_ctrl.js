@@ -50,6 +50,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	this.setLogLevel = function (logLevel) {
 		switch (logLevel) {
 			case "quiet":
+			case "silent":
 				this.logLevel = this.STRICT;
 				break;
 			case "default":
@@ -661,9 +662,23 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		return this.lastRoll !== null && this.lastRoll.length === 2 && this.lastRoll[0] === this.lastRoll[1];
 	};
 
+	/**
+	 * Deal the player the given card.
+	 * Remove 1 of the card from the deck.
+	 */
 	this.dealCard = function (cardName, player) {
 		var card = cards[cardName];
 		this.deck[cardName]--;
+		if (! player.cards.hasOwnProperty(cardName)) {
+			player.cards[cardName] = 0;
+		}
+		player.cards[cardName]++;
+	};
+
+	/**
+	 * Transfer the card from the deck to the player, *without* removing it from the deck.
+	 */
+	this.giveCard = function (cardName, player) {
 		if (! player.cards.hasOwnProperty(cardName)) {
 			player.cards[cardName] = 0;
 		}
@@ -714,6 +729,8 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		// evaluate points after saving card
 		if (card.color === colors.GREY) {
 			player.points++;
+		} else if (card.color === colors.PURPLE) {
+			player.purpleCardCount++;
 		}
 	};
 
@@ -751,8 +768,8 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		Math.shuffle(this.players);
 
 		for (var i = 0; i < this.players.length; i++) {
-			this.dealCard("WHEAT_FIELD", this.players[i]);
-			this.dealCard("BAKERY", this.players[i]);
+			this.giveCard("WHEAT_FIELD", this.players[i]);
+			this.giveCard("BAKERY", this.players[i]);
 		}
 	};
 

@@ -21,6 +21,7 @@ function Player (name, weights) {
 	this.money = 0;
 	this.points = 0;
 	this.isHuman = false;
+	this.purpleCardCount = 0;
 
 	// for AI?
 	weights = weights || {};
@@ -91,7 +92,7 @@ Player.prototype.feedbackCardWeights = function (gameState) {
 Player.prototype.canBuyCard = function (cardName) {
 	"use strict";
 	var card = cards[cardName];
-	return card.cost <= this.money && ! (card.color === colors.GREY && this.hasCard(cardName));
+	return card.cost <= this.money && ! (card.color === colors.GREY && this.hasCard(cardName)) && (card.color !== colors.PURPLE || this.purpleCardCount === 0);
 };
 
 /**
@@ -115,20 +116,16 @@ Player.prototype.getAffordableCards = function (gameState) {
 
 Player.prototype.turn = function (gameState) {
 	"use strict";
-	
-	var canAffordCards = this.getAffordableCards(gameState);
+	var canAffordCards, buyCardName;
 
-	if (canAffordCards.length > 0) {
-		var buyCardName = this.pickBuyCard(canAffordCards);
-		var buyCard = cards[buyCardName];
-
+	do {
+		canAffordCards = this.getAffordableCards(gameState);
+		buyCardName = this.pickBuyCard(canAffordCards);
 		if (buyCardName !== null) {
 			gameState.writeLog(this, "buying " + buyCardName);
 			gameState.buyCard(buyCardName, this);
 		}
-	} else {
-		gameState.writeLog(this, "cannot afford any cards");
-	}
+	} while (buyCardName !== null && canAffordCards.length > 0);
 };
 
 Player.prototype.hasCard = function (cardName) {
@@ -142,8 +139,8 @@ Player.prototype.hasCard = function (cardName) {
  */
 Player.prototype.pickBuyCard = function (canAffordCards) {
 	"use strict";
-	var cardName;
-	var a = [];
+	var cardName, score, maxScore = 0;
+	var bestCard = null;
 
 	if (canAffordCards.length === 0) {
 		return null;
@@ -154,30 +151,15 @@ Player.prototype.pickBuyCard = function (canAffordCards) {
 		return null;
 	}
 
-	// extremely simple check to see if player can win the game immediately
-	if (this.points === 3) {
-		for (var i = 0; i < canAffordCards.length; i++) {
-			cardName = canAffordCards[i];
-			if (cards[cardName].color === colors.GREY) {
-				return cardName;
-			}
-		}
-	}
-
 	for (var i = 0; i < canAffordCards.length; i++) {
 		cardName = canAffordCards[i];
-
-		// add 1 card for each additional weight
-		for (var j = 0; j < this.cardWeights[this.points][cardName]; j++) {
-			a.push(cardName);
+		score = this.cardWeights[this.points][cardName];
+		if (score > maxScore) {
+			maxScore = score;
+			bestCard = cardName;
 		}
 	}
-	if (a.length > 0) {
-		return Math.randChoice(a);	
-	} else {
-		// this shouldn't really happen
-		return null;
-	}
+	return bestCard;
 };
 
 /**
