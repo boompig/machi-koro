@@ -81,7 +81,7 @@ var colors = {
 
 /**
  * These are the in-play game cards
- * TODO these do not include purple cards
+ * TODO these may not include some purple cards
  */
 var cards = {
 	WHEAT_FIELD: new Card("Wheat Field", 1, 1, colors.BLUE, [1], categories.WHEAT, "Receive 1 coin from the bank regardless of whose turn it is."),
