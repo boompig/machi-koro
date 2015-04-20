@@ -35,7 +35,13 @@
 			<div id="player-container">
 				<div class="player" ng-repeat="player in game.players" id="{{ player.name }}"
 					ng-class="{ playerTurn: game.isPlayerTurn(player) }">
-					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">{{ player.name }}</div>
+					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
+						<span>{{ player.name }}</span><!-- 
+						<div>E[1, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[1] }}</div>
+						<div>E[1, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[1] }}</div>
+						<div>E[2, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[2] }}</div>
+						<div>E[2, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[2] }}</div> -->
+					</div>
 
 					<div class="plus-money" ng-show="plusMoney[player.name]"
 					ng-class="{ fadeOut: plusMoney[player.name] }">+{{ plusMoney[player.name] }}</div>
@@ -52,6 +58,11 @@
 							</div>
 							<div class="card-yield">
 								<span>Yields {{ game.getCardYield(player, cardName) ? game.getCardYield(player, cardName).amt : "nothing" }}</span>
+								<!-- <div>E[1, myTurn] = {{ game.getCardExpectedValueYourTurn(player, cardName)["1"] }}</div>
+								<div>E[1, allTurns] = {{ game.getCardExpectedValueAllTurns(player, cardName)["1"] }}</div>
+								
+								<div>E[2, myTurn] = {{ game.getCardExpectedValueYourTurn(player, cardName)["2"] }}</div>
+								<div>E[2, allTurns] = {{ game.getCardExpectedValueAllTurns(player, cardName)["2"] }}</div> -->
 							</div>
 						</div>
 					</div>

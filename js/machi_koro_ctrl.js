@@ -24,7 +24,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	"use strict";
 
 
-	this.STRICT = 10;
+	this.SILENT = 10;
 	this.DEFAULT = 30;
 	this.DEBUG = 40;
 	this.VERBOSE = 50;
@@ -51,7 +51,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		switch (logLevel) {
 			case "quiet":
 			case "silent":
-				this.logLevel = this.STRICT;
+				this.logLevel = this.SILENT;
 				break;
 			case "default":
 				this.logLevel = this.DEFAULT;
@@ -378,6 +378,107 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		return totalYield;
 	};
 
+	this.getTwoDiceLikelihood = function (card) {
+		var l = 0;
+		for (var i = 0; i < card.roll.length; i++) {
+			var d = card.roll[i];
+			// distance from 7
+			var dist = Math.abs(7 - d);
+			// distance from 7 is distance from 6/36
+			var pts = 6 - dist;
+			l += (1.0 / 36.0) * pts;
+		}
+		return l;
+	};
+
+	this.getOneDiceLikelihood = function (card) {
+		var l = 0;
+		for (var i = 0; i < card.roll.length; i++) {
+			if (card.roll[i] <= 6) {
+				l += (1.0 / 6.0);
+			}
+		}
+		return l;
+	};
+
+	/**
+	 * Returns object { 1: <number to 2 decimals>, 2: <number to 2 decimals> }
+	 */
+	this.getPlayerExpectedValueYourTurn = function (player) {
+		var v = { 1: 0, 2: 0 }, e;
+		for (var cardName in player.cards) {
+			if (player.cards[cardName] > 0) {
+				e = this.getCardExpectedValueYourTurn(player, cardName);
+				v[1] += e[1];
+				v[2] += e[2];
+			}
+		}
+		return v;
+	};
+
+	/**
+	 * Returns object { 1: <number to 2 decimals>, 2: <number to 2 decimals> }
+	 */
+	this.getPlayerExpectedValueAllTurns = function (player) {
+		var v = { 1: 0, 2: 0 }, e;
+		for (var cardName in player.cards) {
+			if (player.cards[cardName] > 0) {
+				e = this.getCardExpectedValueAllTurns(player, cardName);
+				v[1] += e[1];
+				v[2] += e[2];
+			}
+		}
+		return v;
+	};
+
+	/**
+	 * Returns object { 1: <number to 2 decimals>, 2: <number to 2 decimals> }
+	 */
+	this.getCardExpectedValueYourTurn = function (player, cardName) {
+		var cYield = this.getCardYield(player, cardName);
+		var card = cards[cardName];
+		if (cYield === null || cYield.condition === "others_turn" || cYield.amt === 0) {
+			return { 1 : 0, 2 : 0 };
+		}
+		
+		var likelihoodOne = this.getOneDiceLikelihood(card);
+		var expOne = likelihoodOne * cYield.amt;
+
+		var likelihoodTwo = this.getTwoDiceLikelihood(card);
+		var expTwo = likelihoodTwo * cYield.amt;
+
+		return {
+			1: Math.round(expOne * 100) / 100,
+			2: Math.round(expTwo * 100) / 100
+		};
+	};
+
+	/**
+	 * this returns likelihood on another person's turn
+	 * Returns object { 1: <number to 2 decimals>, 2: <number to 2 decimals> }
+	 */
+	this.getCardExpectedValueAllTurns = function (player, cardName) {
+		var cYield = this.getCardYield(player, cardName);
+		var card = cards[cardName];
+		if (cYield === null || cYield.condition === "your_turn" || cYield.amt === 0) {
+			return { 1 : 0, 2 : 0 };
+		}
+		// one dice context - the likelihood is the # of elements in roll
+		var likelihoodOne = this.getOneDiceLikelihood(card);
+		var expOne = likelihoodOne * cYield.amt;
+
+		var likelihoodTwo = this.getTwoDiceLikelihood(card);
+		var expTwo = likelihoodTwo * cYield.amt;
+
+		return {
+			1: Math.round(expOne * 100) / 100,
+			2: Math.round(expTwo * 100) / 100
+		};
+	};
+
+	/**
+	 * Returns null for grey cards, Yield object for all other cards
+	 */
 	this.getCardYield = function (player, cardName) {
 		var card = cards[cardName];
 		var numCard = player.cards[cardName];
@@ -780,7 +881,6 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	};
 
 	this.writeLog = function (player, msg, logLevel) {
-		"use strict";
 		if (! logLevel) {
 			logLevel = this.DEFAULT;
 		}

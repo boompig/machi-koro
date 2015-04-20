@@ -11,7 +11,7 @@ Genetic._names = ["Daniel", "Sergei", "Ross", "Elia", "Alex", "Alice", "Alexey",
 
 // iterations obviously dictates what the size of the next generation will be
 Genetic.ITERATIONS_PER_GENERATION = 10;
-Genetic.GAMES_PER_SESSION = 10;
+Genetic.GAMES_PER_SESSION = 25;
 Genetic._logFlags = {
 	"GENETIC_MUTATE": false,
 	"AVG_TURN": true,
@@ -25,13 +25,13 @@ Genetic.log = function(flag, msg) {
 	if (Genetic._logFlags[flag]) {
 		console.log("[%s] %s", flag, msg);
 	}
-}
+};
 
 /**
  * @param population	Mapping from AI names to algorithms
  * @return Mapping of AI names to 
  */
-Genetic.runGenetic = function (population) {
+Genetic.runGenetic = function (population, generation) {
 	if (! population) {
 		population = Genetic.createPool();
 	}
@@ -54,8 +54,16 @@ Genetic.runGenetic = function (population) {
 		nextGenNames.push(progeny.name);
 	}
 
-	Genetic.log("AVG_TURN", "Average turn duration was " + Genetic._mean(t));
+	t.sort(function(a, b) {
+		return b - a;
+	});
+
+	Genetic.log("AVG_TURN", "Average turn duration for generation " + generation + " was " + Genetic._mean(t) + "; lowest was " + Genetic._min(t));
 	return nextGeneration;
+};
+
+Genetic._min = function (arr) {
+	return arr[arr.length - 1];
 };
 
 Genetic._mean = function (arr) {
@@ -65,7 +73,7 @@ Genetic._mean = function (arr) {
 	}
 
 	return s / arr.length;
-}
+};
 
 /**
  * Assume that algo has properties <algo> and <name>
@@ -121,14 +129,14 @@ Genetic.playGame = function (players) {
 	for (var playerName in players) {
 		scores[playerName] = 0;
 	}
-	var t = 0;
+	var t = 0, winningAlgoName;
 
 	for (var i = 0; i < Genetic.GAMES_PER_SESSION; i++) {
 		var gameController = game.getController(players, "silent");
 		Genetic.log("GENETIC_PLAY_GAME", "Starting game");
 		gameController.playGame();
 		Genetic.log("GENETIC_PLAY_GAME", "Game over");
-		var winningAlgoName = gameController.getCurrentPlayer().name;
+		winningAlgoName = gameController.getCurrentPlayer().name;
 		scores[winningAlgoName]++;
 		t += gameController.turn;
 	}
@@ -137,7 +145,7 @@ Genetic.playGame = function (players) {
 	playerOrder.sort(function (a, b) {
 		return scores[b] - scores[a];
 	});
-	var winningAlgoName = playerOrder[0];
+	winningAlgoName = playerOrder[0];
 
 	return {
 		"name": winningAlgoName,
@@ -187,11 +195,11 @@ Genetic._readPool = function () {
 
 Genetic.runManyGenetic = function (numGenerations) {
 
-	for (var i = 0; i < numGenerations; i++) {
-		Genetic.log("generation", "Generation " + i);
-		// var currentGen = Genetic._readPool();
-		var currentGen = null;
-		var nextGen = Genetic.runGenetic(currentGen);
+	for (var gen = 0; gen < numGenerations; gen++) {
+		Genetic.log("generation", "Generation " + gen);
+		var currentGen = Genetic._readPool();
+		// var currentGen = null;
+		var nextGen = Genetic.runGenetic(currentGen, gen);
 		Genetic._writePool(nextGen);
 	}
 };
