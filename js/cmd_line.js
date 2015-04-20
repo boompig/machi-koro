@@ -3,7 +3,6 @@
 // actual program starts here
 var fs = require("fs");
 var mc = require("./machi_koro_ctrl.js");
-var Darwin = require("./darwin.js").Darwin;
 
 var State = require("./state.js").State;
 
