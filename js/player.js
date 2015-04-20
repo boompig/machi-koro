@@ -5,11 +5,13 @@ if (require) {
 	var colors = c.colors;
 	var categories = c.categories;
 	var Card = c.Card;
+	var State = require("./state.js").State;
 
 	var globals = {};
 	globals.cards = cards;
 } else {
 	var globals = {};
+	var State = {};
 	globals.cards = cards;
 }
 
@@ -26,26 +28,26 @@ function Player (name, weights) {
 	// for AI?
 	weights = weights || {};
 	this.cardWeights = weights[name] || {};
-	// console.log(this.cardWeights);
 
 	if (Object.keys(this.cardWeights).length === 0) {
 		this.initWeights();
-	} else {
-		this.fillWeights();
 	}
+	// } else {
+	// 	this.fillWeights();
+	// }
 
 	this.purchaseHistory = {};
 }
 
 Player.prototype.saveBuyCard = function (cardName) {
 	"use strict";
-	if (! this.purchaseHistory.hasOwnProperty(this.points)) {
-		this.purchaseHistory[this.points] = {};
-	}
-	if (! this.purchaseHistory[this.points].hasOwnProperty(cardName)) {
-		this.purchaseHistory[this.points][cardName] = 0;
-	}
-	this.purchaseHistory[this.points][cardName]++;
+	// if (! this.purchaseHistory.hasOwnProperty(this.points)) {
+	// 	this.purchaseHistory[this.points] = {};
+	// }
+	// if (! this.purchaseHistory[this.points].hasOwnProperty(cardName)) {
+	// 	this.purchaseHistory[this.points][cardName] = 0;
+	// }
+	// this.purchaseHistory[this.points][cardName]++;
 };
 
 Player.prototype.initWeights = function () {
@@ -121,7 +123,7 @@ Player.prototype.turn = function (gameState) {
 	do {
 		canAffordCards = this.getAffordableCards(gameState);
 		buyCardName = this.pickBuyCard(canAffordCards);
-		if (buyCardName !== null) {
+		if (buyCardName !== null && typeof buyCardName === 'string') {
 			gameState.writeLog(this, "buying " + buyCardName);
 			gameState.buyCard(buyCardName, this);
 		}
@@ -151,15 +153,30 @@ Player.prototype.pickBuyCard = function (canAffordCards) {
 		return null;
 	}
 
-	for (var i = 0; i < canAffordCards.length; i++) {
-		cardName = canAffordCards[i];
-		score = this.cardWeights[this.points][cardName];
-		if (score > maxScore) {
-			maxScore = score;
-			bestCard = cardName;
+	if (this.cardWeights.hasOwnProperty(this.points)) {
+		// this branch is for old behaviour - simple state
+
+		for (var i = 0; i < canAffordCards.length; i++) {
+			cardName = canAffordCards[i];
+			score = this.cardWeights[this.points][cardName];
+			if (score > maxScore) {
+				maxScore = score;
+				bestCard = cardName;
+			}
+		}
+		return bestCard;
+	} else {
+		// this branch is for new behaviour - complex state
+		var currentState = State.getState(this);
+		var buyCard = this.cardWeights[currentState];
+		if (canAffordCards.length > 0 && (buyCard === null || canAffordCards.indexOf(buyCard) === -1)) {
+			// pick random dude from cards I can afford
+			var idx = Math.floor(canAffordCards.length * Math.random());
+			return canAffordCards[idx];
+		} else {
+			return buyCard;
 		}
 	}
-	return bestCard;
 };
 
 /**

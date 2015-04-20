@@ -3,9 +3,9 @@
 // actual program starts here
 var fs = require("fs");
 var mc = require("./machi_koro_ctrl.js");
-var flags = require("./cmd_lib.js");
-var Flags = flags.Flags;
 var Darwin = require("./darwin.js").Darwin;
+
+var State = require("./state.js").State;
 
 var minProgressIterations = 100;
 var maxProgressBars = 20;
@@ -39,11 +39,13 @@ function copyWeights (weights) {
 function pickPlayers (weights) {
 	// pick any 4 players from the assortment of players
 	var names = Object.keys(weights);
-	while (names.length > 4) {
+	var players = [];
+	while (players.length < 4) {
 		var idx = Math.floor(Math.random() * names.length);
-		names.splice(idx, 1);
+		var name = names.splice(idx, 1);
+		players.push(name);
 	}
-	return names;
+	return players;
 }
 
 /**
@@ -278,13 +280,13 @@ function doMutations (winners, weights) {
 	var absoluteWinner = names[0];
 	var winnerWeights = weights[absoluteWinner];
 	var numChildren = getNumMutations(winners);
-	console.log("Mutating weights for AI %s; generated %d children", absoluteWinner, numChildren);
+	console.log("Mutating weights for AI '%s'; generated %d children", absoluteWinner, numChildren);
 
 	for (var i = 0; i < numChildren; i++) {
 		var newWeights = mutateWeights(winnerWeights);
 		var newName = getChildName(absoluteWinner, weights);
 		
-		console.log("Saving weights for new AI %s", newName);
+		console.log("Saving weights for new AI '%s'", newName);
 		weights[newName] = newWeights;
 		saveWeights(weights);
 	}
@@ -319,8 +321,7 @@ function oldMain () {
 	var counter = 0;
 
 	var players = pickPlayers(oldWeights);
-	console.log("Using these players:");
-	console.log(players);
+	console.log("Using these players: %s", players.join(", "));
 	var winners = initWinners(players);
 
 	console.log("Running simulation for %d iterations", iterations);
@@ -339,7 +340,6 @@ function oldMain () {
 
 	return winners;
 }
-
 
 function main () {
 	var numMutations = 1;
@@ -370,7 +370,7 @@ function main () {
 		if (iterations >= minRemove) {
 			// remove worst player
 			var worstPlayer = players[players.length - 1];
-			console.log("Removing %s from population", worstPlayer);
+			console.log("Removing AI '%s' from population", worstPlayer);
 			// remove this player
 			delete oldWeights[worstPlayer];
 		}

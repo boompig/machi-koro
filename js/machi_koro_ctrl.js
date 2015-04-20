@@ -639,7 +639,8 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 
 		// check for victory, abort if found
 		for (var i = 0; i < this.players.length; i++) {
-			if (this.players[i].points === 4) {
+			// I'm doing >=, because I've had weird bugs in the past where victory condition doesn't register
+			if (this.players[i].points >= 4) {
 				this.state = states.GG;
 				var wp = this.players[i];
 				this.writeLog(wp, wp.name + " has won the game!");
@@ -686,6 +687,9 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	};
 
 	this.doTurn = function () {
+		if (this.state === states.GG)
+			return;
+
 		if (this.state === states.ROLL) {
 			this.rollDice();
 			this.evalStrat();
@@ -714,10 +718,11 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 
 	/**
 	 * Buy the card, then deal it to the player
+	 * @return True iff card was bought
 	 */
 	this.buyCard = function (cardName, player) {
 		if (! this.canBuyCard(cardName, player)) {
-			return;
+			return false;
 		}
 
 		var card = cards[cardName];
@@ -732,6 +737,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		} else if (card.color === colors.PURPLE) {
 			player.purpleCardCount++;
 		}
+		return true;
 	};
 
 	this.initGame = function () {
