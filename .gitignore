@@ -3,7 +3,8 @@
 # created by sass when it compiles css
 .sass-cache
 # generated CSS
-visual.css
+css/visual.css
+css/visual.css.map
 
 # sublime file
 *.sublime-*

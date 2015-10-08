@@ -1,4 +1,22 @@
-# Decision List
+# Game Logic
+
+## Cards to implement
+
+* BUSINESS_COMPLEX
+
+# Visuals
+
+* always show current cards
+* can shrink other players' cards when it's not their turn
+* put the players around a table or something
+
+## Animation Issues
+
+* the +/- popups are per-card rather than per-turn
+
+# AI Improvements
+
+## Decision List
 
 * Roll 2 dice or 1 when player owns TRAIN_STATION
 * Which (if any) card to buy
@@ -6,19 +24,11 @@
 * which player to steal from if player owns TV_STATION
 * which player to steal from and which card to steal if player owns BUSINESS_COMPLEX
 
-# Cards to implement
-
-* BUSINESS_COMPLEX
-
-# Animation Issues
-
-* the +/- popups are per-card rather than per-turn
-
-# AI
+## AI
 
 * after each game, the winning AI adds +1 to the weights of each card they used to win
 
-# Further AI Ideas
+## Further AI Ideas
 
 * add a concept of waiting/saving
 * keep track of money

@@ -1,2 +1,2 @@
 all:
-	sass css/visual.scss > css/visual.css
+	sass scss/visual.scss > css/visual.css
