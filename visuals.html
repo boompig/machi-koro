@@ -3,23 +3,22 @@
 	<head>
 		<title>Machi Koro Simulation</title>
 		<meta charset="utf-8" />
-		<!-- CDN-hosted bootstrap -->
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
 
 		<link rel="stylesheet" href="css/visual.css" />
 	</head>
 	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
 		<div id="main-container">
 			<div id="dice-container" ng-class="{ newDice: animateDice }">
-				<span ng-if="game.lastRoll !== null">
-					<img class="dice-img" 
+				<span ng-if="game.lastRoll !== null" ng-cloak>
+					<img class="dice-img"
 					ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
 					<img class="dice-img" ng-if="game.lastRoll.length > 1"
 					ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
 				</span>
 			</div>
 
-			<div id="deck-container">
+			<div id="deck-container" ng-cloak>
 				<h4 class="section-title">Deck</h4>
 				<div class="card vis-card" ng-repeat="cardName in getDeck(game)">
 					<img class="card-img selectable-card" ng-src="images/cards/{{ cardName.toLowerCase() }}" alt="{{ getCardDescription(cardName) }}"
@@ -32,11 +31,11 @@
 				</div>
 			</div>
 
-			<div id="player-container">
+			<div id="player-container" ng-cloak>
 				<div class="player" ng-repeat="player in game.players" id="{{ player.name }}"
 					ng-class="{ playerTurn: game.isPlayerTurn(player) }">
 					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
-						<span>{{ player.name }}</span><!-- 
+						<span>{{ player.name }}</span><!--
 						<div>E[1, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[1] }}</div>
 						<div>E[1, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[1] }}</div>
 						<div>E[2, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[2] }}</div>
@@ -60,7 +59,7 @@
 								<span>Yields {{ game.getCardYield(player, cardName) ? game.getCardYield(player, cardName).amt : "nothing" }}</span>
 								<!-- <div>E[1, myTurn] = {{ game.getCardExpectedValueYourTurn(player, cardName)["1"] }}</div>
 								<div>E[1, allTurns] = {{ game.getCardExpectedValueAllTurns(player, cardName)["1"] }}</div>
-								
+
 								<div>E[2, myTurn] = {{ game.getCardExpectedValueYourTurn(player, cardName)["2"] }}</div>
 								<div>E[2, allTurns] = {{ game.getCardExpectedValueAllTurns(player, cardName)["2"] }}</div> -->
 							</div>
@@ -70,7 +69,7 @@
 				</div>
 			</div>
 
-			<div id="btn-panel">
+			<div id="btn-panel" ng-cloak>
 				<span ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
 					<button class="btn btn-primary" ng-click="game.rollDice(1)" ng-show="game.state === 'ROLL'"
 					ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
@@ -87,14 +86,14 @@
 			</div>
 
 			<div id="game-over" ng-show="game.state === 'GAME_OVER'"
-			ng-class="{ gameOver : game.state === 'GAME_OVER' }">Game Over</div>
+			ng-class="{ gameOver : game.state === 'GAME_OVER' }" ng-cloak>Game Over</div>
 		</div>
 
-		<footer>Turn {{ game.turn }}</footer>
+		<footer ng-cloak>Turn {{ game.turn }}</footer>
 
 		<!-- google-hosted JQuery and Angular -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.js"></script>
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/angular/angular.js"></script>
 
 		<script src="js/utils.js"></script>
 

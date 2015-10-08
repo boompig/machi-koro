@@ -1,0 +1,25 @@
+{
+  "name": "machi_koro",
+  "version": "0.0.0",
+  "homepage": "https://github.com/boompig/machi_koro",
+  "authors": [
+    "Daniel Kats <dbkats@cs.toronto.edu>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "private": true,
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5",
+    "angular": "~1.4.7"
+  }
+}

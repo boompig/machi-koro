@@ -33,7 +33,7 @@ img.disabled {
 
 /**
  * Not-globals
- */	
+ */
 
 #dice-container {
 	display: block;
@@ -282,3 +282,10 @@ footer {
 	margin: 0 auto;
 	text-align: center;
 }
+
+/**
+ * Hide angular stuff on page load
+ */
+ [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+   display: none !important;
+ }
