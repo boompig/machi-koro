@@ -34,8 +34,8 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		"Daniel",
 		"Sergei",
 		"Alexey",
-		// "Ross"
-		"Rich"
+		"Ross",
+		//"Rich"
 	];
 
 	this.humanPlayers = [];
@@ -108,7 +108,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 			if (idx < 0) {
 				console.log("Adding new player " + name);
 				// displace one of the players at random
-				idx = Math.randInt(0, this.playerNames.length);
+				idx = Math.randInt(0, game.playerNames.length);
 				game.playerNames[idx] = name;
 			} else {
 				console.log("Replacing existing player " + name);
