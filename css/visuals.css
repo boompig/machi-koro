@@ -1,0 +1,241 @@
+/**
+ * Variables
+ */
+* {
+  font-size: 1em; }
+
+/**
+ * Globals
+ */
+.section-title {
+  margin: 2px auto;
+  text-align: center; }
+
+.card-img {
+  height: 200px; }
+
+.vis-card {
+  float: left;
+  display: inline; }
+
+.vis-card .card-name {
+  text-align: center;
+  margin: 2px auto; }
+
+img.disabled {
+  opacity: 0.4;
+  cursor: default; }
+
+/**
+ * Not-globals
+ */
+#dice-container {
+  display: block;
+  clear: both;
+  position: fixed;
+  left: 84%; }
+  #dice-container img.dice-img {
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    border: 0; }
+
+#main-container {
+  margin: 10px auto;
+  width: 1300px; }
+
+@media (min-width: 1400px) {
+  #main-container {
+    width: 1400px; } }
+#deck-container {
+  margin: 0;
+  padding: 0;
+  width: 430px;
+  display: inline-block;
+  overflow: auto;
+  vertical-align: top; }
+  @media (max-height: 799px) {
+    #deck-container {
+      height: 700px; } }
+  @media (min-height: 800px) {
+    #deck-container {
+      height: 750px; } }
+  @media (min-height: 900px) {
+    #deck-container {
+      height: 850px; } }
+  #deck-container .card-img {
+    height: 200px; }
+  #deck-container .vis-card .card-name {
+    font-size: 0.9em; }
+  #deck-container .selectable-card:not(.disabled) {
+    cursor: pointer; }
+
+#btn-panel {
+  clear: both;
+  display: block;
+  width: 100%;
+  margin: 10px auto;
+  text-align: center; }
+  #btn-panel .btn {
+    margin-left: 5px; }
+
+#player-container {
+  clear: both;
+  display: inline-block;
+  vertical-align: top;
+  padding: 0;
+  margin: 0;
+  width: 800px;
+  overflow: auto;
+  	/*
+  	.player {
+  		height: 100px;
+  		width: 200px;
+  	}
+  
+  	.player:nth-of-type(1) {
+  		transform:
+  			rotate(0)
+  			translate($width / 2)
+  			rotate(0);
+  	}
+  
+  	.player:nth-of-type(2) {
+  		transform:
+  			rotate(90)
+  			translate($width / 2)
+  			rotate(-90);
+  	}
+  
+  	.player:nth-of-type(3) {
+  		transform:
+  			rotate(180)
+  			translate($width / 2)
+  			rotate(-180);
+  	}
+  
+  	.player:nth-of-type(4) {
+  		transform:
+  			rotate(270)
+  			translate($width / 2)
+  			rotate(-270);
+  	}*/ }
+  @media (max-height: 799px) {
+    #player-container {
+      height: 700px; } }
+  @media (min-height: 800px) {
+    #player-container {
+      height: 750px; } }
+  @media (min-height: 900px) {
+    #player-container {
+      height: 850px; } }
+  #player-container .player-name {
+    font-size: 1.2em;
+    font-weight: default; }
+  #player-container .plus-money {
+    color: green; }
+  #player-container .minus-money {
+    color: red; }
+  #player-container .player-name.playerTurn {
+    color: red; }
+  #player-container .player-cards {
+    display: block;
+    clear: both; }
+  #player-container .card .card-yield, #player-container .card .card-name {
+    font-size: 0.9em;
+    text-align: center; }
+  #player-container .card .card-yield {
+    margin: 0; }
+  #player-container .player-after {
+    clear: both; }
+
+/**
+ * Animation
+ */
+@keyframes fadeOut {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(40px, -60px); } }
+@-webkit-keyframes fadeOut {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(40px, -60px); } }
+.fadeOut {
+  animation-name: fadeOut;
+  animation-duration: 3000ms;
+  -webkit-animation-name: fadeOut;
+  -webkit-animation-duration: 3000ms;
+  opacity: 0;
+  font-size: 2em;
+  height: 0; }
+
+@keyframes gameOver {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+@-webkit-keyframes gameOver {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+.gameOver {
+  animation-name: gameOver;
+  animation-duration: 2000ms;
+  -webkit-animation-name: gameOver;
+  -webkit-animation-duration: 2000ms;
+  font-size: 4em;
+  position: fixed;
+  color: red;
+  top: 50%;
+  z-index: 100;
+  background-color: black;
+  width: 100%;
+  text-align: center;
+  transform: rotate(45deg);
+  padding: 0;
+  margin: 0;
+  vertical-align: middle; }
+
+@-webkit-keyframes newDice {
+  0% {
+    opacity: 0;
+    position: fixed;
+    transform: translate(-500px, 300px) scale(2, 2); }
+  25% {
+    opacity: 1;
+    transform: translate(-500px, 300px) scale(2, 2); }
+  40% {
+    opacity: 1;
+    transform: translate(-500px, 300px) scale(2, 2); } }
+@keyframes newDice {
+  0% {
+    opacity: 0;
+    position: fixed;
+    transform: translate(-500px, 300px) scale(2, 2); }
+  25% {
+    opacity: 1;
+    transform: translate(-500px, 300px) scale(2, 2); }
+  40% {
+    opacity: 1;
+    transform: translate(-500px, 300px) scale(2, 2); } }
+#dice-container.newDice {
+  -webkit-animation-name: newDice;
+  -webkit-animation-duration: 1900ms;
+  animation-name: newDice;
+  animation-duration: 1900ms; }
+
+footer {
+  color: #777;
+  margin: 0 auto;
+  text-align: center; }
+
+/**
+ * Hide angular stuff on page load
+ */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important; }
