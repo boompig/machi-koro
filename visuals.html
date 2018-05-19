@@ -3,7 +3,14 @@
 	<head>
 		<title>Machi Koro Simulation</title>
 		<meta charset="utf-8" />
-		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+
+		<!-- locally-hosted CSS library -->
+		<!--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />-->
+		<!-- CDN-hosted CSS library -->
+		<link rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+			integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+			crossorigin="anonymous" />
 
 		<link rel="stylesheet" href="css/visual.css" />
 	</head>
@@ -21,7 +28,7 @@
 			<div id="deck-container" ng-cloak>
 				<h4 class="section-title">Deck</h4>
 				<div class="card vis-card" ng-repeat="cardName in getDeck(game)">
-					<img class="card-img selectable-card" ng-src="images/cards/{{ cardName.toLowerCase() }}" alt="{{ getCardDescription(cardName) }}"
+					<img class="card-img selectable-card" ng-src="images/cards/{{ cardName.toLowerCase() }}.png" alt="{{ getCardDescription(cardName) }}"
 					ng-class="{ disabled: (!game.canBuyCard(cardName, game.getCurrentPlayer()) || !game.getCurrentPlayer().isHuman) }"
 					ng-click="game.buyCard(cardName, game.getCurrentPlayer())" />
 					<div class="card-name">
@@ -35,7 +42,7 @@
 				<div class="player" ng-repeat="player in game.players" id="{{ player.name }}"
 					ng-class="{ playerTurn: game.isPlayerTurn(player) }">
 					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
-						<span>{{ player.name }}</span><!--
+						<span>{{ player.name }} ({{ player.isHuman ? "Human": "AI" }})</span><!--
 						<div>E[1, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[1] }}</div>
 						<div>E[1, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[1] }}</div>
 						<div>E[2, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[2] }}</div>
@@ -91,9 +98,19 @@
 
 		<footer ng-cloak>Turn {{ game.turn }}</footer>
 
-		<!-- google-hosted JQuery and Angular -->
-		<script src="bower_components/jquery/dist/jquery.min.js"></script>
-		<script src="bower_components/angular/angular.js"></script>
+		<!-- CDN-hosted libraries -->
+		<script
+			src="https://code.jquery.com/jquery-3.3.1.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"
+			integrity="sha256-zBy1l2WBAh2vPF8rnjFMUXujsfkKjya0Jy5j6yKj0+Q="
+			crossorigin="anonymous"></script>
+
+		<!-- local libraries -->
+		<!--<script src="bower_components/jquery/dist/jquery.min.js"></script>-->
+		<!--<script src="bower_components/angular/angular.js"></script>-->
 
 		<script src="js/utils.js"></script>
 

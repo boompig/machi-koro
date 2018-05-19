@@ -35,7 +35,6 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 		"Sergei",
 		"Alexey",
 		"Ross",
-		//"Rich"
 	];
 
 	this.humanPlayers = [];
@@ -101,19 +100,24 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	 * Only call this on UI
 	 */
 	$scope.onLoad = function (game) {
-		var s = window.location.search.split("?")[1];
-		if (s) {
-			var name = s.split("=")[1];
-			var idx = game.playerNames.indexOf(name)
+		let url = new URL(window.location.href);
+		let name = url.searchParams.get("name");
+		if(name) {
+			// prettify the name of the player
+			name = name[0].toUpperCase() + name.substr(1).toLowerCase();
+			let idx = game.playerNames.indexOf(name)
 			if (idx < 0) {
 				console.log("Adding new player " + name);
 				// displace one of the players at random
 				idx = Math.randInt(0, game.playerNames.length);
 				game.playerNames[idx] = name;
+				game.humanPlayers.push(idx);
 			} else {
 				console.log("Replacing existing player " + name);
 				game.humanPlayers.push(idx);
 			}
+		} else {
+			console.warn("Name must be set to play.");
 		}
 		game.initGame();
 	};
@@ -262,7 +266,7 @@ var MachiKoroCtrl = function ($scope, $location, $anchorScroll, $timeout) {
 	};
 
 	this.isPlayerTurn = function (player) {
-		var idx = this.players.indexOf(player);
+		let idx = this.players.indexOf(player);
 		return idx === (this.turn % this.players.length);
 	};
 

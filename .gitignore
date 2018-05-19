@@ -1,13 +1,15 @@
 # Mac garbage
 .DS_Store
+
 # created by sass when it compiles css
 .sass-cache
+
 # generated CSS
 css/visual.css
 css/visual.css.map
 
-# sublime file
+# editor files
 *.sublime-*
 
 # bower files
-bower_components
+node_modules

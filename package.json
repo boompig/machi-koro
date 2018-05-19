@@ -1,0 +1,25 @@
+{
+  "name": "machi_koro",
+  "version": "1.0.0",
+  "description": "* Machi Koro game and single-player visualisation * Machi Koro multi-player (with bad graphics) and zero-player simulation * Machi Koro command line simulation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"postinstall": "sass scss/visual.scss > css/visual.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boompig/machi_koro.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boompig/machi_koro/issues"
+  },
+  "homepage": "https://github.com/boompig/machi_koro#readme",
+  "dependencies": {
+    "angular": "^1.4.14",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.3.1"
+  }
+}

@@ -3,6 +3,10 @@
  */
 $height: 700px;
 
+* {
+	font-size: 1em;
+}
+
 /**
  * Globals
  */
@@ -67,9 +71,20 @@ img.disabled {
 	width: 430px;
 
 	display: inline-block;
-	height: $height;
 	overflow: auto;
 	vertical-align: top;
+
+	@media(max-height: 799px) {
+		height: $height;
+	}
+
+	@media(min-height: 800px) {
+		height: 750px;
+	}
+
+	@media(min-height: 900px) {
+		height: 850px;
+	}
 
 	.card-img {
 		height: 200px;
@@ -105,8 +120,19 @@ img.disabled {
 	margin: 0;
 	$width: 800px;
 	width: $width;
-	height: $height;
 	overflow: auto;
+
+	@media(max-height: 799px) {
+		height: $height;
+	}
+
+	@media(min-height: 800px) {
+		height: 750px;
+	}
+
+	@media(min-height: 900px) {
+		height: 850px;
+	}
 
 	/*
 	.player {
