@@ -5,8 +5,8 @@
 .sass-cache
 
 # generated CSS
-css/visual.css
-css/visual.css.map
+css/visuals.css
+css/visuals.css.map
 
 # editor files
 *.sublime-*
