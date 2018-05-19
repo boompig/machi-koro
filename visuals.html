@@ -13,25 +13,27 @@
 			integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
 			crossorigin="anonymous" />
 
-		<link rel="stylesheet" href="css/visuals.css" />
+		<link rel="stylesheet" href="css/visuals.scss" />
 	</head>
-	<body ng-controller="MachiKoroCtrl as game" ng-init="onLoad(game)">
+	<body data-ng-controller="MachiKoroCtrl as game" data-ng-init="onLoad(game)">
 		<div id="main-container">
-			<div id="dice-container" ng-class="{ newDice: animateDice }">
-				<span ng-if="game.lastRoll !== null" ng-cloak>
+			<div id="dice-container" data-ng-class="{ newDice: animateDice }">
+				<span data-ng-if="game.lastRoll !== null" data-ng-cloak>
 					<img class="dice-img"
-					ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png" />
-					<img class="dice-img" ng-if="game.lastRoll.length > 1"
-					ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png" />
+						data-ng-src="images/dice/dice-{{ game.lastRoll[0] }}.png"
+						alt="First Die {{ game.lastRoll[0] }}" />
+					<img class="dice-img" data-ng-if="game.lastRoll.length > 1"
+						data-ng-src="images/dice/dice-{{ game.lastRoll[1] }}.png"
+						alt="Second Die {{ game.lastRoll[1] }}" />
 				</span>
 			</div>
 
-			<div id="deck-container" ng-cloak>
+			<div id="deck-container" data-ng-cloak>
 				<h4 class="section-title">Deck</h4>
-				<div class="card vis-card" ng-repeat="cardName in getDeck(game)">
-					<img class="card-img selectable-card" ng-src="images/cards/{{ cardName.toLowerCase() }}.png" alt="{{ getCardDescription(cardName) }}"
-					ng-class="{ disabled: (!game.canBuyCard(cardName, game.getCurrentPlayer()) || !game.getCurrentPlayer().isHuman) }"
-					ng-click="game.buyCard(cardName, game.getCurrentPlayer())" />
+				<div class="card vis-card" data-ng-repeat="cardName in getDeck(game)">
+					<img class="card-img selectable-card" data-ng-src="images/cards/{{ cardName.toLowerCase() }}.png" alt="{{ getCardDescription(cardName) }}"
+					data-ng-class="{ disabled: (!game.canBuyCard(cardName, game.getCurrentPlayer()) || !game.getCurrentPlayer().isHuman) }"
+					data-ng-click="game.buyCard(cardName, game.getCurrentPlayer())" />
 					<div class="card-name">
 						<span>{{ getDeckQty(game, cardName) }} x</span>
 						<span>{{ getCardName(cardName) }}</span>
@@ -39,10 +41,10 @@
 				</div>
 			</div>
 
-			<div id="player-container" ng-cloak>
-				<div class="player" ng-repeat="player in game.players" id="{{ player.name }}"
-					ng-class="{ playerTurn: game.isPlayerTurn(player) }">
-					<div class="player-name" ng-class="{ playerTurn: game.isPlayerTurn(player) }">
+			<div id="player-container" data-ng-cloak>
+				<div class="player" data-ng-repeat="player in game.players" id="{{ player.name }}"
+						data-ng-class="{ playerTurn: game.isPlayerTurn(player) }">
+					<div class="player-name" data-ng-class="{ playerTurn: game.isPlayerTurn(player) }">
 						<span>{{ player.name }} ({{ player.isHuman ? "Human": "AI" }})</span><!--
 						<div>E[1, myTurn] = {{ game.getPlayerExpectedValueYourTurn(player)[1] }}</div>
 						<div>E[1, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[1] }}</div>
@@ -50,15 +52,15 @@
 						<div>E[2, allTurns] = {{ game.getPlayerExpectedValueAllTurns(player)[2] }}</div> -->
 					</div>
 
-					<div class="plus-money" ng-show="plusMoney[player.name]"
-					ng-class="{ fadeOut: plusMoney[player.name] }">+{{ plusMoney[player.name] }}</div>
-					<div class="minus-money" ng-show="minusMoney[player.name]"
-					ng-class="{ fadeOut: minusMoney[player.name] }">-{{ minusMoney[player.name] }}</div>
+					<div class="plus-money" data-ng-show="plusMoney[player.name]"
+						data-ng-class="{ fadeOut: plusMoney[player.name] }">+{{ plusMoney[player.name] }}</div>
+					<div class="minus-money" data-ng-show="minusMoney[player.name]"
+						data-ng-class="{ fadeOut: minusMoney[player.name] }">-{{ minusMoney[player.name] }}</div>
 
 					<div class="player-money">Money: {{ player.money }}</div>
 					<div class="player-cards">
-						<div ng-repeat="cardName in getSortedPlayerCards(player)" class="card vis-card">
-							<img class="card-img" ng-src="images/cards/{{ cardName }}.png" alt="{{ getCardDescription(cardName) }}" />
+						<div data-ng-repeat="cardName in getSortedPlayerCards(player)" class="card vis-card">
+							<img class="card-img" data-ng-src="images/cards/{{ cardName.toLowerCase() }}.png" alt="{{ getCardDescription(cardName) }}" />
 							<div class="card-name">
 								<span>{{ getCardQty(cardName, player) }} x</span>
 								<span>{{ getCardName (cardName) }}</span>
@@ -77,27 +79,27 @@
 				</div>
 			</div>
 
-			<div id="btn-panel" ng-cloak>
-				<span ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
-					<button class="btn btn-primary" ng-click="game.rollDice(1)" ng-show="game.state === 'ROLL'"
-					ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
-					<button class="btn btn-primary" ng-click="game.rollDice(2)" ng-show="game.state === 'ROLL'"
-					ng-disabled="game.state !== 'ROLL' || !game.getCurrentPlayer().canRollTwoDice()">Roll 2 Dice</button>
-					<button class="btn btn-danger" ng-click="endHumanTurn(game)" ng-show="game.state === 'BUY'"
-					ng-disabled="game.state !== 'BUY'">End Turn</button>
+			<div id="btn-panel" data-ng-cloak>
+				<span data-ng-show="game.getCurrentPlayer().isHuman" class="human-panel">
+					<button class="btn btn-primary" data-ng-click="game.rollDice(1)" data-ng-show="game.state === 'ROLL'"
+						data-ng-disabled="game.state !== 'ROLL'">Roll 1 Die</button>
+					<button class="btn btn-primary" data-ng-click="game.rollDice(2)" data-ng-show="game.state === 'ROLL'"
+						data-ng-disabled="game.state !== 'ROLL' || !game.getCurrentPlayer().canRollTwoDice()">Roll 2 Dice</button>
+					<button class="btn btn-danger" data-ng-click="endHumanTurn(game)" data-ng-show="game.state === 'BUY'"
+						data-ng-disabled="game.state !== 'BUY'">End Turn</button>
 				</span>
-				<span ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
-					<button class="btn btn-primary" ng-click="doTurn(game)"
-					ng-disabled="game.state !== 'ROLL' || animateDice">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
+				<span data-ng-hide="game.getCurrentPlayer().isHuman" class="bot-panel">
+					<button class="btn btn-primary" data-ng-click="doTurn(game)"
+						data-ng-disabled="game.state !== 'ROLL' || animateDice">Evaluate {{ game.getCurrentPlayer().name }}'s Turn</button>
 				</span>
-				<button class="btn btn-info" ng-click="newGame(game)">New Game</button>
+				<button class="btn btn-info" data-ng-click="newGame(game)">New Game</button>
 			</div>
 
-			<div id="game-over" ng-show="game.state === 'GAME_OVER'"
-			ng-class="{ gameOver : game.state === 'GAME_OVER' }" ng-cloak>Game Over</div>
+			<div id="game-over" data-ng-show="game.state === 'GAME_OVER'"
+				data-ng-class="{ gameOver : game.state === 'GAME_OVER' }" data-ng-cloak>Game Over</div>
 		</div>
 
-		<footer ng-cloak>Turn {{ game.turn }}</footer>
+		<footer data-ng-cloak>Turn {{ game.turn }}</footer>
 
 		<!-- CDN-hosted libraries -->
 		<script
