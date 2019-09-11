@@ -1,12 +1,12 @@
-var State = require("./state.js").State;
-var game = require("./cmd_line_helper.js");
-var fs = require("fs");
+const State = require("./state.js").State;
+const game = require("./cmd_line_helper.js");
+const fs = require("fs");
 
 /************************************************************************************************************************************************
  * 							The true way of genetic algorithms
  *************************************************************************************************************************************************/
 
-var Genetic = {};
+let Genetic = {};
 Genetic._names = ["Daniel", "Sergei", "Ross", "Elia", "Alex", "Alice", "Alexey", "Richard", "Avraham"];
 
 // iterations obviously dictates what the size of the next generation will be
@@ -36,20 +36,20 @@ Genetic.runGenetic = function (population, generation) {
 		population = Genetic.createPool();
 	}
 
-	var nextGeneration = {}, nextGenNames = [];
+	let nextGeneration = {}, nextGenNames = [];
 
-	var t = [];
+	let t = [];
 
-	for (var i = 0; i < Genetic.ITERATIONS_PER_GENERATION; i++) {
-		var popForGame = Genetic.pickForGame(population);
+	for (let i = 0; i < Genetic.ITERATIONS_PER_GENERATION; i++) {
+		let popForGame = Genetic.pickForGame(population);
 
 		// so what happened?
-		var winningAlgo = Genetic.playGame(popForGame);
+		let winningAlgo = Genetic.playGame(popForGame);
 		t.push(winningAlgo.turns);
 
 		// have this algo reproduce
-		var tmp = Genetic.copyAlgo(winningAlgo);
-		var progeny = Genetic.mutateAlgo(tmp, nextGenNames);
+		let tmp = Genetic.copyAlgo(winningAlgo);
+		let progeny = Genetic.mutateAlgo(tmp, nextGenNames);
 		nextGeneration[ progeny.name ] = progeny.algo;
 		nextGenNames.push(progeny.name);
 	}
@@ -67,8 +67,8 @@ Genetic._min = function (arr) {
 };
 
 Genetic._mean = function (arr) {
-	var s = 0;
-	for (var i = 0; i < arr.length; i++) {
+	let s = 0;
+	for (let i = 0; i < arr.length; i++) {
 		s += arr[i];
 	}
 
@@ -79,9 +79,9 @@ Genetic._mean = function (arr) {
  * Assume that algo has properties <algo> and <name>
  */
 Genetic.copyAlgo = function (algo) {
-	var copy =  {};
-	for (var state in algo.algo) {
-		var actionCopy = algo.algo[state];
+	const copy = {};
+	for (let state in algo.algo) {
+		let actionCopy = algo.algo[state];
 		copy[state] = actionCopy;
 	}
 	return {
@@ -91,7 +91,7 @@ Genetic.copyAlgo = function (algo) {
 };
 
 Genetic._getChildName = function (parentName, algoNames) {
-	var version, baseName;
+	let version, baseName;
 	if (parentName.indexOf(" ") === -1) {
 		baseName = parentName;
 		version = 2;
@@ -100,7 +100,7 @@ Genetic._getChildName = function (parentName, algoNames) {
 		baseName = parentName.split(" ")[0];
 	}
 
-	var name = baseName + " " + String(version);
+	let name = baseName + " " + String(version);
 	while (algoNames.indexOf(name) !== -1) {
 		version++;
 		name = baseName + " " + String(version);
@@ -125,14 +125,14 @@ Genetic.mutateAlgo = function (algo, algoNames) {
  * @return  {name : <algoName>, algo: <algo>}
  */
 Genetic.playGame = function (players) {
-	var scores = {};
-	for (var playerName in players) {
+	let scores = {};
+	for (let playerName in players) {
 		scores[playerName] = 0;
 	}
-	var t = 0, winningAlgoName;
+	let t = 0, winningAlgoName;
 
-	for (var i = 0; i < Genetic.GAMES_PER_SESSION; i++) {
-		var gameController = game.getController(players, "silent");
+	for (let i = 0; i < Genetic.GAMES_PER_SESSION; i++) {
+		let gameController = game.getController(players, "silent");
 		Genetic.log("GENETIC_PLAY_GAME", "Starting game");
 		gameController.playGame();
 		Genetic.log("GENETIC_PLAY_GAME", "Game over");
@@ -141,7 +141,7 @@ Genetic.playGame = function (players) {
 		t += gameController.turn;
 	}
 
-	var playerOrder = Object.keys(players);
+	let playerOrder = Object.keys(players);
 	playerOrder.sort(function (a, b) {
 		return scores[b] - scores[a];
 	});
@@ -159,10 +159,10 @@ Genetic.playGame = function (players) {
  * @return subset of population
  */
 Genetic.pickForGame = function (population) {
-	var names = Object.keys(population);
-	var subPop = {}, name;
+	let names = Object.keys(population);
+	let subPop = {}, name;
 	while (Object.keys(subPop).length < 4) {
-		var idx = Math.floor(Math.random() * names.length);
+		let idx = Math.floor(Math.random() * names.length);
 		name = names.splice(idx, 1)[0];
 		subPop[name] = population[name];
 	}
@@ -174,8 +174,8 @@ Genetic.pickForGame = function (population) {
  * @return Mapping from AI names to algos
  */
 Genetic.createPool = function () {
-	var pop = {}, algo;
-	for (var i = 0; i < Genetic._names.length; i++) {
+	let pop = {};
+	for (let i = 0; i < Genetic._names.length; i++) {
 		pop[Genetic._names[i]] = Genetic._genRandomAlgo();
 	}
 	return pop;
@@ -195,11 +195,11 @@ Genetic._readPool = function () {
 
 Genetic.runManyGenetic = function (numGenerations) {
 
-	for (var gen = 0; gen < numGenerations; gen++) {
+	for (let gen = 0; gen < numGenerations; gen++) {
 		Genetic.log("generation", "Generation " + gen);
-		var currentGen = Genetic._readPool();
-		// var currentGen = null;
-		var nextGen = Genetic.runGenetic(currentGen, gen);
+		let currentGen = Genetic._readPool();
+		// let currentGen = null;
+		let nextGen = Genetic.runGenetic(currentGen, gen);
 		Genetic._writePool(nextGen);
 	}
 };

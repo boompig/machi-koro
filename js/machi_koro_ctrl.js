@@ -1,3 +1,5 @@
+/* global window, confirm, prompt */
+
 if (typeof require === "function") {
 	require("./utils.js");
 

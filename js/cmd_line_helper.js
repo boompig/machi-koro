@@ -1,4 +1,4 @@
-var mc = require("./machi_koro_ctrl.js");
+const mc = require("./machi_koro_ctrl.js");
 
 /**
  * Initialize the controller with the given weights
@@ -7,8 +7,8 @@ var mc = require("./machi_koro_ctrl.js");
  */
 function getController (weights, logLevel) {
 	// command-line invocation of MachiKoro
-	var scope = {};
-	var ctrl = new mc.MachiKoroCtrl(scope);
+	let scope = {};
+	let ctrl = new mc.MachiKoroCtrl(scope);
 	if (weights) {
 		ctrl.weights = weights;
 	}

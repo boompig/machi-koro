@@ -1,34 +1,29 @@
-"use strict";
+const fs = require("fs");
+const mc = require("./machi_koro_ctrl.js");
 
-// actual program starts here
-var fs = require("fs");
-var mc = require("./machi_koro_ctrl.js");
-
-var State = require("./state.js").State;
-
-var minProgressIterations = 100;
-var maxProgressBars = 20;
-var minRemove = 10;
+const minProgressIterations = 100;
+const maxProgressBars = 20;
+const minRemove = 10;
 
 /**
  * Read weights from file system
  */
 function readWeights() {
-	return JSON.parse(fs.readFileSync("./weights.js"));
+	return JSON.parse(fs.readFileSync("./weights.json"));
 }
 
 /**
  * Save weights to file system
  */
 function saveWeights(weights) {
-	fs.writeFileSync("./weights.js", JSON.stringify(weights, null, 4));
+	fs.writeFileSync("./weights.json", JSON.stringify(weights, null, 4));
 }
 
 function copyWeights (weights) {
-	var copy = {};
-	for (var p in weights) {
+	let copy = {};
+	for (let p in weights) {
 		copy[p] = {};
-		for (var cardName in weights[p]) {
+		for (let cardName in weights[p]) {
 			copy[p][cardName] = weights[p][cardName];
 		}
 	}
@@ -37,11 +32,11 @@ function copyWeights (weights) {
 
 function pickPlayers (weights) {
 	// pick any 4 players from the assortment of players
-	var names = Object.keys(weights);
-	var players = [];
+	let names = Object.keys(weights);
+	let players = [];
 	while (players.length < 4) {
-		var idx = Math.floor(Math.random() * names.length);
-		var name = names.splice(idx, 1);
+		let idx = Math.floor(Math.random() * names.length);
+		let name = names.splice(idx, 1);
 		players.push(name);
 	}
 	return players;
@@ -67,16 +62,16 @@ function pickPlayers (weights) {
  * Return the new weights
  */
 function mutateWeights (weights) {
-	var prMutate = 0.1;
-	var prCreate = 0.05;
-	var prDelete = 0.01;
+	let prMutate = 0.1;
+	let prCreate = 0.05;
+	let prDelete = 0.01;
 
-	var p, cardName, count;
-	var weightsCopy = copyWeights(weights);
-	var mFactor;
+	let p, cardName, count;
+	let weightsCopy = copyWeights(weights);
+	let mFactor;
 
-	var mutateAdd = 100;
-	var creationAdd = 500;
+	let mutateAdd = 100;
+	let creationAdd = 500;
 
 	for (p in weights) {
 		for (cardName in weights[p]) {
@@ -107,8 +102,8 @@ function mutateWeights (weights) {
  */
 function getController (weights, logLevel, players) {
 	// command-line invocation of MachiKoro
-	var scope = {};
-	var ctrl = new mc.MachiKoroCtrl(scope);
+	let scope = {};
+	let ctrl = new mc.MachiKoroCtrl(scope);
 	if (weights) {
 		ctrl.weights = weights;
 	}
@@ -130,16 +125,16 @@ function getController (weights, logLevel, players) {
  * @return Number of turns in the game
  */
 function runSimul(winners, oldWeights, logLevel, players) {
-	var ctrl = getController(oldWeights, logLevel, players);
+	let ctrl = getController(oldWeights, logLevel, players);
 
 	ctrl.playGame();
-	var wp = ctrl.getCurrentPlayer();
+	let wp = ctrl.getCurrentPlayer();
 	// console.log(oldWeights[wp.name]);
 	wp.feedbackCardWeights(ctrl);
 
 	oldWeights[wp.name] = wp.cardWeights;
 	// console.log(oldWeights[wp.name]);
-	
+
 	// console.log("*** WINNING WEIGHTS FOR " + wp.name + " ***");
 	// console.log(wp.cardWeights);
 	saveWeights(oldWeights);
@@ -148,21 +143,21 @@ function runSimul(winners, oldWeights, logLevel, players) {
 }
 
 function initWinners(players) {
-	var ctrl = getController(null, null, players);
+	let ctrl = getController(null, null, players);
 
-	var winners = {};
+	let winners = {};
 
-	for (var p = 0; p < ctrl.players.length; p++) {
-		var name = ctrl.players[p].name;
+	for (let p = 0; p < ctrl.players.length; p++) {
+		let name = ctrl.players[p].name;
 		winners[name] = 0;
 	}
 	return winners;
 }
 
 function getWorstPlayer(winners, numIterations) {
-	var n, lowestPlayer;
-	var lowestScore = numIterations;
-	for (var playerName in winners) {
+	let n, lowestPlayer;
+	let lowestScore = numIterations;
+	for (let playerName in winners) {
 		n = winners[playerName];
 		if (n < lowestScore) {
 			lowestPlayer = playerName;
@@ -173,8 +168,8 @@ function getWorstPlayer(winners, numIterations) {
 }
 
 function resetWorstPlayer(winners, numIterations) {
-	var weights = readWeights();
-	var playerName = getWorstPlayer(winners, numIterations);
+	let weights = readWeights();
+	let playerName = getWorstPlayer(winners, numIterations);
 	console.log("Resetting weights for " + playerName);
 	weights[playerName] = {};
 	saveWeights(weights);
@@ -183,12 +178,12 @@ function resetWorstPlayer(winners, numIterations) {
 function printResults(winners, avgTurns, numIterations) {
 	console.log("Average number of turns per game: " + Math.round(avgTurns));
 	console.log("Winning stats:");
-	var names = Object.keys(winners);
-	var sortedNames = names.sort(function (a, b) {
+	let names = Object.keys(winners);
+	let sortedNames = names.sort(function (a, b) {
 		return winners[b] - winners[a];
 	});
-	for (var i = 0; i < sortedNames.length; i++) {
-		var n = winners[sortedNames[i]];
+	for (let i = 0; i < sortedNames.length; i++) {
+		let n = winners[sortedNames[i]];
 		console.log(sortedNames[i] + " : " + (n / numIterations * 100) + "%");
 	}
 }
@@ -197,11 +192,11 @@ function printResults(winners, avgTurns, numIterations) {
  * Used for debugging
  */
 function computeWeightDiff (o1, o2) {
-	for (var playerName in o1) {
-		var w1 = o1[playerName];
-		var w2 = o2[playerName];
-		for (var p = 0; p < 4; p++) {
-			for (var c in w1[p]) {
+	for (let playerName in o1) {
+		let w1 = o1[playerName];
+		let w2 = o2[playerName];
+		for (let p = 0; p < 4; p++) {
+			for (let c in w1[p]) {
 				if (w1[p][c] != w2[p][c]) {
 					console.log ("Entry for " + playerName + "," + p + "," + c + " was " + w1[p][c] + " but is now " + w2[p][c]);
 				}
@@ -214,12 +209,12 @@ function computeWeightDiff (o1, o2) {
  * Print progress bar.
  */
 function printProgress(iteration, maxIterations) {
-	var getNumBars = function (i) {
+	let getNumBars = function (i) {
 		return Math.floor((i + 1) / maxIterations * maxProgressBars);
 	};
 
-	var numBars = getNumBars(iteration);
-	var oldNumBars = getNumBars(iteration - 1);
+	let numBars = getNumBars(iteration);
+	let oldNumBars = getNumBars(iteration - 1);
 	if (iteration > 0 && numBars === oldNumBars) {
 		return;
 	}
@@ -229,39 +224,39 @@ function printProgress(iteration, maxIterations) {
 		process.stdout.cursorTo(0);
 	}
 
-	var numSpaces = maxProgressBars - numBars;
-	var bars = new Array(numBars + 1).join("=");
-	var spaces = new Array(numSpaces + 1).join(" ");
+	let numSpaces = maxProgressBars - numBars;
+	let bars = new Array(numBars + 1).join("=");
+	let spaces = new Array(numSpaces + 1).join(" ");
 	process.stdout.write("[" + bars + ">" + spaces + "]");
 }
 
 function getNumMutations (winners) {
-	var total = 0;
-	var players = Object.keys(winners);
+	let total = 0;
+	let players = Object.keys(winners);
 	players.sort(function (a, b) {
 		return winners[b] - winners[a];
 	});
 
-	for (var i = 0; i < players.length; i++) {
+	for (let i = 0; i < players.length; i++) {
 		total += winners[players[i]];
 	}
 
-	var winningPlayer = players[0];
-	var perWin = winners[winningPlayer] / total * 100;
+	let winningPlayer = players[0];
+	let perWin = winners[winningPlayer] / total * 100;
 	return 1 + Math.floor((perWin - 25) / 5.0);
 }
 
 function getChildName (absoluteWinner, weights) {
-	var newName, lastPart;
+	let newName, lastPart;
 	if (absoluteWinner.indexOf(" ") === -1) {
 		newName = absoluteWinner + " 2";
 	} else {
-		var lastPart = Number(absoluteWinner.split(" ")[1]);
+		let lastPart = Number(absoluteWinner.split(" ")[1]);
 		lastPart++;
 		newName = absoluteWinner.split(" ")[0] + " " + String(lastPart);
 	}
 
-	while (weights.hasOwnProperty(newName)) {
+	while (newName in weights) {
 		lastPart = Number(newName.split(" ")[1]);
 		lastPart++;
 		newName = absoluteWinner.split(" ")[0] + " " + String(lastPart);
@@ -271,20 +266,20 @@ function getChildName (absoluteWinner, weights) {
 
 function doMutations (winners, weights) {
 	// only absolute winner gets to mutate
-	var names = Object.keys(winners);
+	let names = Object.keys(winners);
 	// sort names in descending order
 	names.sort(function (a, b) {
 		return winners[b] - winners[a];
 	});
-	var absoluteWinner = names[0];
-	var winnerWeights = weights[absoluteWinner];
-	var numChildren = getNumMutations(winners);
+	let absoluteWinner = names[0];
+	let winnerWeights = weights[absoluteWinner];
+	let numChildren = getNumMutations(winners);
 	console.log("Mutating weights for AI '%s'; generated %d children", absoluteWinner, numChildren);
 
-	for (var i = 0; i < numChildren; i++) {
-		var newWeights = mutateWeights(winnerWeights);
-		var newName = getChildName(absoluteWinner, weights);
-		
+	for (let i = 0; i < numChildren; i++) {
+		let newWeights = mutateWeights(winnerWeights);
+		let newName = getChildName(absoluteWinner, weights);
+
 		console.log("Saving weights for new AI '%s'", newName);
 		weights[newName] = newWeights;
 		saveWeights(weights);
@@ -292,39 +287,39 @@ function doMutations (winners, weights) {
 }
 
 function oldMain () {
-	var iterations = 1;
-	var logLevel = "default";
+	let iterations = 1;
+	let logLevel = "default";
 	if (process.argv.length > 2) {
 		iterations = Number(process.argv[2]);
 	}
 	if (process.argv.length > 3) {
 		switch (process.argv[3]) {
-		case "-q":
-			logLevel = "quiet";
-			console.log("Running simulation silently...");
-			break;
-		case "-qq":
-			logLevel = "silent";
-			console.log("Running simulation silently...");
-			break;
-		case "-v":
-			logLevel = "verbose";
-			break;
-		default:
-			logLevel = "default";
-			break;
+			case "-q":
+				logLevel = "quiet";
+				console.log("Running simulation silently...");
+				break;
+			case "-qq":
+				logLevel = "silent";
+				console.log("Running simulation silently...");
+				break;
+			case "-v":
+				logLevel = "verbose";
+				break;
+			default:
+				logLevel = "default";
+				break;
 		}
 	}
 
-	var oldWeights = readWeights();
-	var counter = 0;
+	let oldWeights = readWeights();
+	let counter = 0;
 
-	var players = pickPlayers(oldWeights);
+	let players = pickPlayers(oldWeights);
 	console.log("Using these players: %s", players.join(", "));
-	var winners = initWinners(players);
+	let winners = initWinners(players);
 
 	console.log("Running simulation for %d iterations", iterations);
-	for (var i = 0; i < iterations; i++) {	
+	for (let i = 0; i < iterations; i++) {
 		oldWeights = readWeights();
 		counter += runSimul(winners, oldWeights, logLevel, players);
 		if (iterations >= minProgressIterations && logLevel === "quiet") {
@@ -341,8 +336,8 @@ function oldMain () {
 }
 
 function main () {
-	var numMutations = 1;
-	var iterations = 1;
+	let numMutations = 1;
+	let iterations = 1;
 	if (process.argv.length > 2) {
 		iterations = Number(process.argv[2]);
 	}
@@ -350,25 +345,25 @@ function main () {
 		numMutations = Number(process.argv[4]);
 	}
 
-	for (var i = 0; i < numMutations; i++) {
+	for (let i = 0; i < numMutations; i++) {
 		// run the simulation
-		var winners = oldMain();
+		let winners = oldMain();
 
-		var players = Object.keys(winners);
+		let players = Object.keys(winners);
 		// sort descending by number of wins
 		players.sort(function (a, b) {
 			return winners[b] - winners[a];
 		});
 
 
-		var oldWeights = readWeights();
+		let oldWeights = readWeights();
 
 		// mutate best players
 		doMutations(winners, oldWeights);
-		
+
 		if (iterations >= minRemove) {
 			// remove worst player
-			var worstPlayer = players[players.length - 1];
+			let worstPlayer = players[players.length - 1];
 			console.log("Removing AI '%s' from population", worstPlayer);
 			// remove this player
 			delete oldWeights[worstPlayer];
@@ -379,3 +374,6 @@ function main () {
 }
 
 main();
+
+// I don't want to delete this function so just exporting it
+module.exports = [ resetWorstPlayer, computeWeightDiff ];
