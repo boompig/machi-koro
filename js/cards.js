@@ -1,3 +1,5 @@
+/* exported Card, Yield */
+
 "use strict";
 
 /**
@@ -45,9 +47,9 @@ Card.prototype.hasEffect = function (diceRoll, isPlayerTurn) {
 		return false;
 	}
 
-	return (isPlayerTurn && (this.color === colors.GREEN || this.color === colors.PURPLE)) || 
-		   (this.color === colors.BLUE) ||
-		   (!isPlayerTurn && this.color === colors.RED);
+	return (isPlayerTurn && (this.color === colors.GREEN || this.color === colors.PURPLE)) ||
+		(this.color === colors.BLUE) ||
+		(!isPlayerTurn && this.color === colors.RED);
 };
 
 Card.prototype.isGrey = function () {

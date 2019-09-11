@@ -1,3 +1,6 @@
+/* global angular, MachiKoroCtrl */
+/* exported app */
+
 function getPlayerName () {
 	var params = window.location.search.split("?")[1];
 	if (! params) {
@@ -10,9 +13,9 @@ function getPlayerName () {
 var pageName = "visuals.html";
 
 if (getPlayerName() === null && window.location.href.indexOf(pageName) > 0) {
-	var url = window.location.href.replace(pageName, "")
+	var url = window.location.href.replace(pageName, "");
 	window.location.href = url;
 }
 
 var app = angular.module("MachiKoroSimul", [])
-				.controller("MachiKoroCtrl", MachiKoroCtrl);
+	.controller("MachiKoroCtrl", MachiKoroCtrl);

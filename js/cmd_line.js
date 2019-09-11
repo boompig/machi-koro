@@ -1,4 +1,4 @@
-	"use strict";
+"use strict";
 
 // actual program starts here
 var fs = require("fs");
@@ -299,20 +299,20 @@ function oldMain () {
 	}
 	if (process.argv.length > 3) {
 		switch (process.argv[3]) {
-			case "-q":
-				logLevel = "quiet";
-				console.log("Running simulation silently...");
-				break;
-			case "-qq":
-				logLevel = "silent";
-				console.log("Running simulation silently...");
-				break;
-			case "-v":
-				logLevel = "verbose";
-				break;
-			default:
-				logLevel = "default";
-				break;
+		case "-q":
+			logLevel = "quiet";
+			console.log("Running simulation silently...");
+			break;
+		case "-qq":
+			logLevel = "silent";
+			console.log("Running simulation silently...");
+			break;
+		case "-v":
+			logLevel = "verbose";
+			break;
+		default:
+			logLevel = "default";
+			break;
 		}
 	}
 

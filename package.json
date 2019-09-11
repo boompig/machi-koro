@@ -1,17 +1,17 @@
 {
   "name": "machi_koro",
   "version": "1.0.0",
-  "description": "* Machi Koro game and single-player visualisation * Machi Koro multi-player (with bad graphics) and zero-player simulation * Machi Koro command line simulation",
-  "main": "index.js",
+  "description": "",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"postinstall": "sass css/visuals.scss > css/visuals.css"
+    "build": "sass css/visuals.scss > css/visuals.css",
+    "lint:browser": "eslint --config .eslintrc.browser.js js/angular_loader.js js/utils.js js/cards.js js/player.js js/machi_koro_ctrl.js",
+    "lint": "yarn lint:browser & yarn lint:cli",
+    "postinstall": "build"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/boompig/machi_koro.git"
-  },
-  "author": "",
+  "repository": "git+https://github.com/boompig/machi_koro.git",
+  "author": "Daniel Kats <dbkats@cs.toronto.edu>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/boompig/machi_koro/issues"
@@ -21,5 +21,10 @@
     "angular": "^1.4.14",
     "bootstrap": "^3.3.7",
     "jquery": "^3.3.1"
+  },
+  "private": true,
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "sass": "^1.23.0-module.beta.1"
   }
 }

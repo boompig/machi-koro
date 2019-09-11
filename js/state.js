@@ -1,3 +1,5 @@
+/* node-env node */
+
 /**
  * The state is an object representing the state of the game, for the AI
  * The point of the state is to be:
@@ -43,7 +45,7 @@ State.buyRandomCard = function (money, action) {
 		money -= cost;
 	}
 	return money;
-}
+};
 
 /**
  * Generate a random action for the given state

@@ -7,7 +7,7 @@ var fs = require("fs");
  *************************************************************************************************************************************************/
 
 var Genetic = {};
-Genetic._names = ["Daniel", "Sergei", "Ross", "Elia", "Alex", "Alice", "Alexey", "Richard", "Avraham"]; 
+Genetic._names = ["Daniel", "Sergei", "Ross", "Elia", "Alex", "Alice", "Alexey", "Richard", "Avraham"];
 
 // iterations obviously dictates what the size of the next generation will be
 Genetic.ITERATIONS_PER_GENERATION = 10;
@@ -29,7 +29,7 @@ Genetic.log = function(flag, msg) {
 
 /**
  * @param population	Mapping from AI names to algorithms
- * @return Mapping of AI names to 
+ * @return Mapping of AI names to
  */
 Genetic.runGenetic = function (population, generation) {
 	if (! population) {
@@ -186,11 +186,11 @@ Genetic._genRandomAlgo = function () {
 };
 
 Genetic._writePool = function(population) {
-	fs.writeFileSync("./pool.js", JSON.stringify(population, null, 4));
+	fs.writeFileSync("./pool.json", JSON.stringify(population, null, 4));
 };
 
 Genetic._readPool = function () {
-	return JSON.parse(fs.readFileSync("./pool.js"));
+	return JSON.parse(fs.readFileSync("./pool.json"));
 };
 
 Genetic.runManyGenetic = function (numGenerations) {
