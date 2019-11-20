@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/boompig/machi_koro#readme",
   "dependencies": {
-    "angular": "^1.4.14",
+    "angular": "^1.7.9",
     "bootstrap": "^3.3.7",
     "jquery": "^3.3.1"
   },
