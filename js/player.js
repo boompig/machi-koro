@@ -5,9 +5,11 @@ if (typeof require === "undefined") {
 	State = {};
 	globals.cards = cards;
 } else {
+	// eslint-disable-next-line
 	var c = require("./cards.js");
 	var cards = c.cards;
 	var colors = c.colors;
+	// eslint-disable-next-line
 	State = require("./state.js").State;
 
 	globals.cards = cards;

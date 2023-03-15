@@ -1,12 +1,16 @@
+// eslint-disable-next-line
 /* global window, confirm, prompt */
 
 if (typeof require === "function") {
+	// eslint-disable-next-line
 	require("./utils.js");
 
 	// then command-line invocation
+	// eslint-disable-next-line
 	var p = require("./player.js");
 	var Player = p.Player;
 
+	// eslint-disable-next-line
 	var c = require("./cards.js");
 	var cards = c.cards;
 	var colors = c.colors;

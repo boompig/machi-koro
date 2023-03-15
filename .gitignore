@@ -9,6 +9,7 @@ css/visuals.css.map
 
 # editor files
 *.sublime-*
+*.code-workspace
 
 # bower files
 node_modules
