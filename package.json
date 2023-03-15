@@ -26,6 +26,7 @@
   "private": true,
   "devDependencies": {
     "eslint": "^8.36.0",
+    "husky": "^8.0.3",
     "sass": "^1.23.0-module.beta.1"
   }
 }
